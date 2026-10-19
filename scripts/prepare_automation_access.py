@@ -29,7 +29,7 @@ template = {'AWSTemplateFormatVersion': '2010-09-09',
                 'Action': 'sts:AssumeRoleWithWebIdentity', 'Condition': {'StringEquals': {
                     'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
                     'token.actions.githubusercontent.com:sub':
-                    'repo:chamindu-supunsara/Wonderland:ref:refs/heads/main'}}}]},
+                    'repo:chamindu-supunsara@80322623/Wonderland@1425166882:ref:refs/heads/main'}}}]},
             'Policies': [{'PolicyName': 'PublishExistingWonderlandImages',
                           'PolicyDocument': policy}]}}},
     'Outputs': {'RoleArn': {'Value': {'Fn::GetAtt': ['ReleaseRole', 'Arn']}}}}
@@ -47,7 +47,11 @@ case "${1:---prepare}" in
     aws accessanalyzer validate-policy --region ap-south-1 --policy-type IDENTITY_POLICY --policy-document file://release-policy.json --output json
     echo 'PREPARED: main branch only; five existing ECR repositories; no application deployment access.' ;;
   --apply)
-    [[ "$(aws iam list-open-id-connect-providers --query 'length(OpenIDConnectProviderList)' --output text)" == 0 ]] || { echo 'Provider inventory changed; review reuse before applying.'; exit 1; }
+    count=$(aws iam list-open-id-connect-providers --query 'length(OpenIDConnectProviderList)' --output text)
+    if [[ "$count" != 0 ]]; then
+      owned=$(aws cloudformation describe-stack-resource --region ap-south-1 --stack-name wonderland-github-release-access --logical-resource-id GitHubProvider --query StackResourceDetail.PhysicalResourceId --output text)
+      [[ "$count" == 1 && "$owned" == arn:aws:iam::708919751353:oidc-provider/token.actions.githubusercontent.com ]] || { echo 'Provider ownership changed; stop for review.'; exit 1; }
+    fi
     aws cloudformation deploy --region ap-south-1 --stack-name wonderland-github-release-access --template-file github-release-access.json --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
     echo 'SUCCEEDED: main-branch GitHub release role created.' ;;
   *) echo 'Use --prepare or --apply'; exit 2 ;;
@@ -60,7 +64,7 @@ with ZipFile(archive, 'w') as zipped:
         zipped.write(folder / name, name)
 report = {'status': 'PREPARED_NOT_APPLIED', 'repository': 'chamindu-supunsara/Wonderland',
           'resources_to_create': 2, 'role': 'wonderland-github-release',
-          'trust_subject': 'repo:chamindu-supunsara/Wonderland:ref:refs/heads/main',
+          'trust_subject': 'repo:chamindu-supunsara@80322623/Wonderland@1425166882:ref:refs/heads/main',
           'ecr_repositories': repos, 'secret_or_eks_access': False,
           'additional_compute_rds_nat_alb': 0, 'combined_planning_usd': 65.41,
           'allowance_usd': 75, 'new_image_storage_reserve_usd': 1,

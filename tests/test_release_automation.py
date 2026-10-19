@@ -80,7 +80,7 @@ def test_oidc_grant_has_exact_main_subject_and_existing_registry_scope():
         "StringEquals": {
             "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
             "token.actions.githubusercontent.com:sub": (
-                "repo:chamindu-supunsara/Wonderland:ref:refs/heads/main"
+                "repo:chamindu-supunsara@80322623/Wonderland@1425166882:ref:refs/heads/main"
             ),
         }
     }

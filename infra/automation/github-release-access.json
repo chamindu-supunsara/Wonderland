@@ -30,7 +30,7 @@
               "Condition": {
                 "StringEquals": {
                   "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-                  "token.actions.githubusercontent.com:sub": "repo:chamindu-supunsara/Wonderland:ref:refs/heads/main"
+                  "token.actions.githubusercontent.com:sub": "repo:chamindu-supunsara@80322623/Wonderland@1425166882:ref:refs/heads/main"
                 }
               }
             }
