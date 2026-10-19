@@ -1,0 +1,90 @@
+{{- if .Values.enabled }}
+{{- range $service, $options := .Values.apis }}
+{{- if $options.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $.Release.Name }}-{{ $service }}
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Release.Name }}-{{ $service }}
+spec:
+  replicas: {{ $.Values.apiReplicas }}
+  revisionHistoryLimit: 2
+  progressDeadlineSeconds: 300
+  strategy:
+    rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
+  selector:
+    matchLabels: {app: {{ $.Release.Name }}-{{ $service }}}
+  template:
+    metadata:
+      annotations:
+        checksum/runtime: {{ include (print $.Template.BasePath "/config.yaml") $ | sha256sum }}
+      labels: {app: {{ $.Release.Name }}-{{ $service }}, component: api}
+    spec:
+      serviceAccountName: {{ $.Release.Name }}-{{ $service }}
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: {app: {{ $.Release.Name }}-{{ $service }}}
+      containers:
+        - name: {{ $service }}
+          image: {{ include "wonderland.image" (dict "root" $ "service" $service) | quote }}
+          ports: [{containerPort: 8000, name: http}]
+          envFrom:
+            - configMapRef: {name: {{ $.Release.Name }}-runtime}
+            - secretRef: {name: {{ index $.Values.secrets $service }}}
+          securityContext:
+            {{- include "wonderland.security" . | nindent 12 }}
+          startupProbe:
+            httpGet: {path: /health/live, port: http}
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet: {path: /health/ready, port: http}
+            timeoutSeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /health/live, port: http}
+            timeoutSeconds: 3
+            periodSeconds: 15
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 384Mi}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {sizeLimit: 64Mi}}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Release.Name }}-{{ $service }}
+spec:
+  type: ClusterIP
+  selector: {app: {{ $.Release.Name }}-{{ $service }}}
+  ports: [{port: 8000, targetPort: http, name: http}]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $.Release.Name }}-{{ $service }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: {app: {{ $.Release.Name }}-{{ $service }}}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,30 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RegistryAuthentication",
+      "Effect": "Allow",
+      "Action": "ecr:GetAuthorizationToken",
+      "Resource": "*"
+    },
+    {
+      "Sid": "PublishFiveExistingRepositories",
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/catalog",
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/booking",
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/payment",
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/admission",
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/analytics"
+      ],
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload",
+        "ecr:PutImage",
+        "ecr:DescribeImages"
+      ]
+    }
+  ]
+}

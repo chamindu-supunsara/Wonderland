@@ -1,0 +1,397 @@
+.hero {
+  display: grid;
+  grid-template-columns: 1.12fr 1fr;
+  min-height: 490px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #e7eddf;
+}
+.hero-copy {
+  padding: 3.5rem 0 3rem 3rem;
+  z-index: 1;
+}
+.hero h1 {
+  font-size: clamp(2.8rem, 4.8vw, 4.5rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.07em;
+  margin: 1.5rem 0;
+}
+.hero h1 span {
+  color: var(--pink);
+}
+.hero-copy > p {
+  max-width: 340px;
+  line-height: 1.7;
+  color: #4d6255;
+  font-size: 0.94rem;
+  margin-bottom: 1.8rem;
+}
+.hero-note {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: 0.7rem;
+  margin-top: 2rem;
+}
+.hero-note span {
+  color: var(--pink);
+  font-size: 1.3rem;
+}
+.hero-art {
+  position: relative;
+  overflow: hidden;
+  min-height: 450px;
+  background: linear-gradient(150deg, #e7eddf, #c2d8bd);
+}
+.sun {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--yellow);
+  right: 3rem;
+  top: 2.4rem;
+}
+.hill {
+  position: absolute;
+  width: 650px;
+  height: 380px;
+  border-radius: 50%;
+  bottom: -270px;
+  transform: rotate(-15deg);
+}
+.hill-back {
+  background: #89a985;
+  left: -50px;
+  bottom: -250px;
+}
+.hill-front {
+  background: #39654a;
+  left: 50px;
+}
+.wheel {
+  position: absolute;
+  width: 235px;
+  height: 235px;
+  border: 9px solid #f5f2df;
+  border-radius: 50%;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow:
+    inset 0 0 0 3px #244638,
+    0 0 0 3px #244638;
+  z-index: 2;
+}
+.spoke {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  background: #466553;
+  top: 0;
+  left: calc(50% - 2px);
+}
+.s2 {
+  transform: rotate(45deg);
+}
+.s3 {
+  transform: rotate(90deg);
+}
+.s4 {
+  transform: rotate(135deg);
+}
+.hub {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background: var(--pink);
+  border: 5px solid #faf4dd;
+  border-radius: 50%;
+  top: calc(50% - 14px);
+  left: calc(50% - 14px);
+}
+.wheel-support {
+  position: absolute;
+  top: 230px;
+  height: 230px;
+  width: 9px;
+  background: #244638;
+  left: calc(50% - 5px);
+  transform-origin: top;
+}
+.wheel-support.left {
+  transform: rotate(18deg);
+}
+.wheel-support.right {
+  transform: rotate(-18deg);
+}
+.floating-label {
+  position: absolute;
+  z-index: 3;
+  top: 70px;
+  left: 18px;
+  background: #f8f5e9;
+  padding: 1rem;
+  border-radius: 12px;
+  transform: rotate(-9deg);
+  font-size: 0.9rem;
+  box-shadow: 0 8px 25px #26473514;
+}
+.floating-label em {
+  display: block;
+  color: var(--pink);
+  font-family: Georgia, serif;
+  font-size: 1.6rem;
+}
+.art-star {
+  position: absolute;
+  z-index: 3;
+  font-size: 5rem;
+  right: 30px;
+  bottom: 65px;
+  color: #f3c951;
+}
+.park-label {
+  position: absolute;
+  z-index: 3;
+  bottom: 30px;
+  left: 25px;
+  color: #f9f5df;
+  font-weight: 800;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  letter-spacing: 0.07em;
+}
+.intro-strip {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  padding: 1.6rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.intro-strip span:nth-child(even) {
+  color: var(--pink);
+}
+.experiences {
+  padding-top: 3.5rem;
+}
+.filters {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 1.8rem 0 1rem;
+}
+.filters button {
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: transparent;
+  border-radius: 99px;
+  padding: 0.65rem 1rem;
+  font-size: 0.78rem;
+}
+.filters button.selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+.results-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 1rem 0;
+}
+.attraction-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+}
+.ride-card {
+  background: #fff;
+  border: 1px solid #e8e8de;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.ride-art {
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  background: #dce6d6;
+}
+.ride-art[data-category='WATER'] {
+  background: #d5e8e9;
+}
+.ride-art[data-category='KIDS'] {
+  background: #f3dfc4;
+}
+.ride-art[data-category='INTERACTIVE'] {
+  background: #e7dce9;
+}
+.art-number {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  opacity: 0.65;
+}
+.ride-symbol {
+  position: absolute;
+  right: 15%;
+  top: -18px;
+  font-size: 10rem;
+  line-height: 1.3;
+  color: #35614c;
+  transform: rotate(-8deg);
+}
+.ride-art[data-category='WATER'] .ride-symbol {
+  color: #297488;
+}
+.ride-art[data-category='KIDS'] .ride-symbol {
+  color: #b65c36;
+}
+.ride-art[data-category='INTERACTIVE'] .ride-symbol {
+  color: #806088;
+}
+.thrill-tag {
+  position: absolute;
+  bottom: 0.8rem;
+  left: 0.8rem;
+  background: #ffffffd9;
+  font-size: 0.65rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 99px;
+  text-transform: capitalize;
+}
+.ride-content {
+  padding: 1.2rem;
+}
+.ride-content .eyebrow {
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.ride-content h3 {
+  margin: 0.7rem 0;
+  font-size: 1.23rem;
+  letter-spacing: -0.04em;
+}
+.ride-content > p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  min-height: 83px;
+}
+.suitability {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  font-size: 0.63rem;
+  font-weight: 650;
+  margin-bottom: 1rem;
+}
+.suitability span {
+  background: #f0f2e9;
+  padding: 0.3rem 0.4rem;
+  border-radius: 4px;
+}
+details {
+  border-top: 1px solid var(--line);
+  padding-top: 0.8rem;
+  font-size: 0.73rem;
+}
+summary {
+  cursor: pointer;
+}
+details p {
+  line-height: 1.6;
+  color: var(--muted);
+}
+.tickets-banner {
+  margin-top: 3rem;
+  border-radius: 20px;
+  padding: 2.2rem;
+  background: #e8eddf;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+.tickets-banner h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: -0.05em;
+  margin: 0.8rem 0;
+}
+.tickets-banner p {
+  font-size: 0.83rem;
+  color: #4d6255;
+  margin: 0;
+}
+.tickets-banner .button {
+  flex-shrink: 0;
+}
+@media (max-width: 1100px) {
+  .attraction-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ride-content > p {
+    min-height: auto;
+  }
+  .hero-copy {
+    padding-left: 2rem;
+  }
+  .intro-strip span:last-child,
+  .intro-strip span:nth-last-child(2) {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+  .hero-copy {
+    padding: 2.2rem 1.6rem;
+  }
+  .hero-art {
+    min-height: 330px;
+  }
+  .wheel {
+    top: 40px;
+    width: 200px;
+    height: 200px;
+  }
+  .wheel-support {
+    top: 140px;
+  }
+  .floating-label {
+    top: 30px;
+  }
+  .intro-strip {
+    justify-content: flex-start;
+    font-size: 0.65rem;
+  }
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .section-heading > p {
+    margin: 0;
+  }
+  .tickets-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.6rem;
+  }
+}
+@media (max-width: 440px) {
+  .attraction-grid {
+    grid-template-columns: 1fr;
+  }
+  .intro-strip span:nth-child(n + 2) {
+    display: none;
+  }
+  .hero h1 {
+    font-size: 3rem;
+  }
+}

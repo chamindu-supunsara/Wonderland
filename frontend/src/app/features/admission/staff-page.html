@@ -1,0 +1,120 @@
+<section class="booking-shell">
+  <span class="eyebrow">WONDERLAND · ADMINISTRATOR STAFF</span>
+  <h1>Mock admission <span>✦</span></h1>
+  <p class="notice">
+    Simulation only. No real park admission is granted. Times below are simulated Asia/Colombo visit
+    times; Python separately records the actual audit time.
+  </p>
+  <nav>
+    <a routerLink="/admin">Administrator area</a
+    ><a routerLink="/bookings">My demonstration tickets</a
+    ><a routerLink="/visits">My visit history</a>
+  </nav>
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+  }
+  @if (notice()) {
+    <p class="notice success" role="status">{{ notice() }}</p>
+  }
+  @if (pending() && !lookup()) {
+    <p class="notice">
+      A ride request needs verification. Restore its guest before retrying the same request.
+    </p>
+    <button (click)="load(true)" [disabled]="busy()">Resume pending guest</button>
+  }
+  <form class="panel" (ngSubmit)="load()" #lookupForm="ngForm">
+    <label for="ticket-reference">Guest demonstration ticket reference</label>
+    <input
+      id="ticket-reference"
+      name="reference"
+      [(ngModel)]="reference"
+      required
+      pattern="MOCK-[A-Fa-f0-9]{32}"
+      [disabled]="busy() || !!pending()"
+      placeholder="MOCK-…"
+    />
+    <small
+      >Copy one guest’s MOCK reference from their confirmed booking. Each guest checks in
+      separately.</small
+    >
+    <button class="primary" [disabled]="lookupForm.invalid || busy() || !!pending()">
+      Look up ticket
+    </button>
+  </form>
+  @if (lookup(); as value) {
+    <article class="panel">
+      <span class="badge">MOCK · GUEST {{ value.ticket.guest_number }}</span>
+      <h2>{{ value.ticket.tier_name }} · {{ value.ticket.booking_reference }}</h2>
+      <p class="reference">{{ value.ticket.reference }}</p>
+      <p>
+        {{ value.ticket.starts_at | date: 'MMM d, y, h:mm a' : '+0530' }} –
+        {{ value.ticket.ends_at | date: 'h:mm a' : '+0530' }} · Asia/Colombo
+      </p>
+      <label for="simulation-time">Simulated visit time (Asia/Colombo)</label>
+      <input
+        id="simulation-time"
+        type="datetime-local"
+        [(ngModel)]="simulationTime"
+        [disabled]="busy() || !!pending()"
+        required
+      />
+      <small
+        >Choose a time within this slot. The slot end is excluded. Ride time must be at or after
+        check-in.</small
+      >
+      @if (value.check_in; as visit) {
+        <p>
+          Checked in (MOCK): {{ visit.occurred_at | date: 'MMM d, y, h:mm a' : '+0530' }}.
+          {{ visit.ride_count }} ride use(s).
+        </p>
+        <button (click)="checkIn()" [disabled]="busy() || !!pending() || !simulationTime">
+          Verify duplicate check-in
+        </button>
+        @if (catalogError()) {
+          <p class="notice error" role="alert">{{ catalogError() }}</p>
+          <button (click)="loadAttractions()" [disabled]="busy()">Reload active attractions</button>
+        }
+        <label for="ride-attraction">Active ride / attraction</label>
+        <select id="ride-attraction" [(ngModel)]="attractionId" [disabled]="busy() || !!pending()">
+          <option value="">Choose an attraction</option>
+          @for (ride of attractions(); track ride.id) {
+            <option [value]="ride.id">{{ ride.name }} · {{ ride.category }}</option>
+          }
+        </select>
+        <small
+          >Staff remain responsible for age, height and suitability checks. This screen records
+          simulated usage.</small
+        >
+        @if (pending()) {
+          <p class="notice">
+            Result unverified. Retry the same recorded request before changing guest, attraction or
+            time.
+          </p>
+        }
+        <button
+          class="primary"
+          (click)="recordRide()"
+          [disabled]="
+            busy() || (!pending() && (!attractionId || !simulationTime || !!catalogError()))
+          "
+        >
+          {{ pending() ? 'Retry same mock ride' : 'Record mock ride usage' }}
+        </button>
+        <h3>Recent ride usage (latest 20)</h3>
+        @for (ride of value.recent_rides; track ride.id) {
+          <p>
+            {{ ride.attraction_name }} · {{ ride.occurred_at | date: 'MMM d, h:mm a' : '+0530' }} ·
+            MOCK
+          </p>
+        } @empty {
+          <p>No ride usage recorded for this guest.</p>
+        }
+      } @else {
+        <p>Not yet checked in. Rides can be recorded after check-in.</p>
+        <button class="primary" (click)="checkIn()" [disabled]="busy() || !simulationTime">
+          Simulate guest check-in
+        </button>
+      }
+    </article>
+  }
+</section>

@@ -1,0 +1,44 @@
+name: wonderland-step10b-test
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: test_root
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD_FILE: /test-password
+    volumes:
+      - ../../.local/deployment/db-bootstrap-test/certs:/cert-source:ro
+      - ../../.local/deployment/db-bootstrap-test/password:/test-password:ro
+    tmpfs:
+      - /var/lib/postgresql/data
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        mkdir -p /tmp/pg-certs
+        cp /cert-source/server.key /tmp/pg-certs/server.key
+        cp /cert-source/server.crt /tmp/pg-certs/server.crt
+        chown -R postgres:postgres /tmp/pg-certs
+        chmod 600 /tmp/pg-certs/server.key
+        exec docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/tmp/pg-certs/server.crt -c ssl_key_file=/tmp/pg-certs/server.key
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U test_root -d postgres]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    networks: [isolated]
+  test:
+    image: wonderland-db-bootstrap:step10b
+    command: [python, /tests/integration_database_bootstrap.py]
+    environment:
+      AWS_EC2_METADATA_DISABLED: 'true'
+      MOCK_PAYMENTS_ENABLED: 'true'
+      MOCK_ADMISSION_ENABLED: 'true'
+    volumes:
+      - ../../tests:/tests:ro
+      - ../../.local/deployment/db-bootstrap-test/certs:/test/certs:ro
+      - ../../.local/deployment/db-bootstrap-test/password:/test-password:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [isolated]
+networks:
+  isolated: {internal: true}

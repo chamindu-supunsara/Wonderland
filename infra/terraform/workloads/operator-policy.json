@@ -1,0 +1,118 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "FiveReleaseRepositories",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload",
+        "ecr:PutImage"
+      ],
+      "Resource": [
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/catalog",
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/booking",
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/payment",
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/admission",
+        "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/analytics"
+      ]
+    },
+    {
+      "Sid": "OnlyEnvironmentTopics",
+      "Effect": "Allow",
+      "Action": [
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:SetTopicAttributes",
+        "sns:TagResource",
+        "sns:UntagResource",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "sns:SetSubscriptionAttributes"
+      ],
+      "Resource": [
+        "arn:aws:sns:ap-south-1:708919751353:wonderland-demo-catalog",
+        "arn:aws:sns:ap-south-1:708919751353:wonderland-demo-booking",
+        "arn:aws:sns:ap-south-1:708919751353:wonderland-demo-admission"
+      ]
+    },
+    {
+      "Sid": "OnlyEnvironmentQueues",
+      "Effect": "Allow",
+      "Action": [
+        "sqs:CreateQueue",
+        "sqs:DeleteQueue",
+        "sqs:SetQueueAttributes",
+        "sqs:TagQueue",
+        "sqs:UntagQueue"
+      ],
+      "Resource": [
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-booking-prices",
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-booking-prices-dlq",
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-booking-prices-delivery-dlq",
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-analytics-bookings",
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-analytics-bookings-dlq",
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-analytics-bookings-delivery-dlq",
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-analytics-admissions",
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-analytics-admissions-dlq",
+        "arn:aws:sqs:ap-south-1:708919751353:wonderland-demo-analytics-admissions-delivery-dlq"
+      ]
+    },
+    {
+      "Sid": "SixEventWorkerRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::708919751353:role/wonderland-demo-catalog-publisher",
+        "arn:aws:iam::708919751353:role/wonderland-demo-booking-publisher",
+        "arn:aws:iam::708919751353:role/wonderland-demo-admission-publisher",
+        "arn:aws:iam::708919751353:role/wonderland-demo-booking-prices",
+        "arn:aws:iam::708919751353:role/wonderland-demo-analytics-bookings",
+        "arn:aws:iam::708919751353:role/wonderland-demo-analytics-admissions"
+      ]
+    },
+    {
+      "Sid": "PassOnlyWorkerRolesToPodIdentity",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": [
+        "arn:aws:iam::708919751353:role/wonderland-demo-catalog-publisher",
+        "arn:aws:iam::708919751353:role/wonderland-demo-booking-publisher",
+        "arn:aws:iam::708919751353:role/wonderland-demo-admission-publisher",
+        "arn:aws:iam::708919751353:role/wonderland-demo-booking-prices",
+        "arn:aws:iam::708919751353:role/wonderland-demo-analytics-bookings",
+        "arn:aws:iam::708919751353:role/wonderland-demo-analytics-admissions"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "pods.eks.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "OnlyDemoPodIdentity",
+      "Effect": "Allow",
+      "Action": [
+        "eks:CreatePodIdentityAssociation",
+        "eks:DeletePodIdentityAssociation",
+        "eks:UpdatePodIdentityAssociation",
+        "eks:TagResource",
+        "eks:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:eks:ap-south-1:708919751353:cluster/wonderland-demo",
+        "arn:aws:eks:ap-south-1:708919751353:podidentityassociation/wonderland-demo/*"
+      ]
+    }
+  ]
+}

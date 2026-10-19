@@ -1,0 +1,17 @@
+# TEST DATA ONLY. example.invalid images cannot be installed or run.
+enabled: true
+frontendOrigin: https://wonderland.example.invalid
+images:
+  catalog: example.invalid/wonderland/catalog@sha256:0000000000000000000000000000000000000000000000000000000000000000
+  booking: example.invalid/wonderland/booking@sha256:0000000000000000000000000000000000000000000000000000000000000000
+  payment: example.invalid/wonderland/payment@sha256:0000000000000000000000000000000000000000000000000000000000000000
+  admission: example.invalid/wonderland/admission@sha256:0000000000000000000000000000000000000000000000000000000000000000
+  analytics: example.invalid/wonderland/analytics@sha256:0000000000000000000000000000000000000000000000000000000000000000
+workers:
+  booking-maintenance: {enabled: true}
+  catalog-publisher: {enabled: true}
+  booking-publisher: {enabled: true}
+  booking-prices: {enabled: true}
+  analytics-bookings: {enabled: true}
+  admission-publisher: {enabled: true}
+  analytics-admissions: {enabled: true}

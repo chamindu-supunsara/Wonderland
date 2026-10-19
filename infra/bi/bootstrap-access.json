@@ -1,0 +1,88 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Temporary Step10E BI bootstrap identity; no database or secret deletion resources.",
+  "Resources": {
+    "BootstrapRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "wonderland-demo-bi-bootstrap",
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "pods.eks.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole",
+                "sts:TagSession"
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestTag/kubernetes-namespace": "wonderland-bootstrap",
+                  "aws:RequestTag/kubernetes-service-account": "bi-bootstrap",
+                  "aws:RequestTag/eks-cluster-arn": "arn:aws:eks:ap-south-1:708919751353:cluster/wonderland-demo"
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "OnlyPrivateBIBootstrap",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "ReadOnlyExistingMaster",
+                  "Effect": "Allow",
+                  "Action": "secretsmanager:GetSecretValue",
+                  "Resource": "arn:aws:secretsmanager:ap-south-1:708919751353:secret:rds!db-1428dad0-d388-45c0-bbd3-baef545c4318-EVaRUF"
+                },
+                {
+                  "Sid": "OnlyTwoBICredentials",
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:DescribeSecret",
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:PutSecretValue"
+                  ],
+                  "Resource": [
+                    "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/metabase-app-??????",
+                    "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/metabase-reporting-??????"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "Wonderland"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "temporary-bi-bootstrap"
+          }
+        ]
+      }
+    },
+    "PodIdentity": {
+      "Type": "AWS::EKS::PodIdentityAssociation",
+      "Properties": {
+        "ClusterName": "wonderland-demo",
+        "Namespace": "wonderland-bootstrap",
+        "ServiceAccount": "bi-bootstrap",
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "BootstrapRole",
+            "Arn"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Wonderland main-branch GitHub OIDC image publishing only",
+  "Resources": {
+    "GitHubProvider": {
+      "Type": "AWS::IAM::OIDCProvider",
+      "Properties": {
+        "Url": "https://token.actions.githubusercontent.com",
+        "ClientIdList": [
+          "sts.amazonaws.com"
+        ]
+      }
+    },
+    "ReleaseRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "wonderland-github-release",
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": {
+                  "Ref": "GitHubProvider"
+                }
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+                  "token.actions.githubusercontent.com:sub": "repo:chamindu-supunsara/Wonderland:ref:refs/heads/main"
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "PublishExistingWonderlandImages",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "RegistryAuthentication",
+                  "Effect": "Allow",
+                  "Action": "ecr:GetAuthorizationToken",
+                  "Resource": "*"
+                },
+                {
+                  "Sid": "PublishFiveExistingRepositories",
+                  "Effect": "Allow",
+                  "Resource": [
+                    "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/catalog",
+                    "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/booking",
+                    "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/payment",
+                    "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/admission",
+                    "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/analytics"
+                  ],
+                  "Action": [
+                    "ecr:BatchCheckLayerAvailability",
+                    "ecr:InitiateLayerUpload",
+                    "ecr:UploadLayerPart",
+                    "ecr:CompleteLayerUpload",
+                    "ecr:PutImage",
+                    "ecr:DescribeImages"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "RoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ReleaseRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

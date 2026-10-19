@@ -1,0 +1,63 @@
+<section class="booking-shell">
+  <span class="eyebrow">YOUR WONDERLAND VISITS</span>
+  <h1>My visit history <span>✦</span></h1>
+  <p class="notice">
+    MOCK history only. These are simulated guest check-ins and ride uses, not real attendance.
+  </p>
+  <nav>
+    <a routerLink="/bookings">My bookings and tickets</a><a routerLink="/account">My account</a
+    ><button (click)="load()" [disabled]="busy()">Refresh visits</button>
+  </nav>
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+  }
+  @if (busy()) {
+    <p role="status">Loading…</p>
+  }
+  <div class="history-list">
+    @for (visit of visits(); track visit.id) {
+      <article class="panel">
+        <span class="badge">MOCK · GUEST {{ visit.ticket.guest_number }}</span>
+        <h2>{{ visit.ticket.tier_name }} · {{ visit.ticket.booking_reference }}</h2>
+        <p>
+          Simulated check-in: {{ visit.occurred_at | date: 'MMM d, y, h:mm a' : '+0530' }} ·
+          Asia/Colombo
+        </p>
+        <small
+          >Recorded by the service:
+          {{ visit.recorded_at | date: 'MMM d, y, h:mm a' : '+0530' }}</small
+        >
+        <p class="reference">{{ visit.ticket.reference }}</p>
+        <p>{{ visit.ride_count }} ride use(s)</p>
+        <button (click)="showRides(visit.id)" [disabled]="busy()">
+          View ride history for guest {{ visit.ticket.guest_number }}
+        </button>
+        @if (selected() === visit.id) {
+          @for (ride of rides(); track ride.id) {
+            <p>
+              {{ ride.attraction_name }} · {{ ride.category }} ·
+              {{ ride.occurred_at | date: 'MMM d, h:mm a' : '+0530' }} · MOCK
+            </p>
+          } @empty {
+            <p>No rides recorded yet.</p>
+          }
+          <nav>
+            <button (click)="showRides(visit.id, -1)" [disabled]="busy() || rideOffset === 0">
+              Previous rides</button
+            ><span>Ride page {{ rideOffset / 20 + 1 }}</span
+            ><button (click)="showRides(visit.id, 1)" [disabled]="busy() || rides().length < 20">
+              Next rides
+            </button>
+          </nav>
+        }
+      </article>
+    } @empty {
+      <p>No simulated visits yet. A staff member checks in each confirmed demonstration ticket.</p>
+    }
+  </div>
+  <nav>
+    <button (click)="load(-1)" [disabled]="busy() || offset === 0">Previous visits</button
+    ><span>Page {{ offset / 20 + 1 }}</span
+    ><button (click)="load(1)" [disabled]="busy() || visits().length < 20">Next visits</button>
+  </nav>
+</section>

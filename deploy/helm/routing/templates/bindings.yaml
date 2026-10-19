@@ -1,0 +1,18 @@
+{{- if ne .Release.Namespace "wonderland" }}{{ fail "Use the wonderland namespace" }}{{ end }}
+{{- if ne (len .Values.targetGroups) 4 }}{{ fail "Provide the four reviewed API target groups" }}{{ end }}
+{{- range $service, $arn := .Values.targetGroups }}
+{{- if not (has $service (list "catalog" "booking" "payment" "admission")) }}{{ fail "Unexpected target service" }}{{ end }}
+{{- if not (regexMatch (printf "^arn:aws:elasticloadbalancing:ap-south-1:708919751353:targetgroup/wl-demo-%s/[a-z0-9]+$" $service) $arn) }}{{ fail "Unexpected target group ARN" }}{{ end }}
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: {{ $.Release.Name }}-{{ $service }}
+spec:
+  targetGroupARN: {{ $arn | quote }}
+  targetType: ip
+  vpcID: {{ $.Values.vpcId | quote }}
+  serviceRef:
+    name: wonderland-{{ $service }}
+    port: 8000
+{{- end }}

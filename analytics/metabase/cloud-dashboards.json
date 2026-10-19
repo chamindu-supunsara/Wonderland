@@ -1,0 +1,22 @@
+{
+  "collection": "Wonderland CLOUD MOCK",
+  "database": "Wonderland CLOUD MOCK Reporting",
+  "timezone": "Asia/Colombo",
+  "public_sharing": false,
+  "dashboards": [
+    {"name": "Wonderland CLOUD MOCK Operations", "questions": [
+      {"name":"CLOUD MOCK - Daily guest arrivals","file":"sql/daily-arrivals.sql","display":"bar"},
+      {"name":"CLOUD MOCK - Popular rides","file":"sql/popular-rides.sql","display":"bar"},
+      {"name":"CLOUD MOCK - Peak and quiet hours (Colombo)","file":"sql/peak-quiet-hours.sql","display":"bar","layout":"full width"},
+      {"name":"CLOUD MOCK - Guest arrivals by tier","file":"sql/arrivals-by-tier.sql","display":"bar"}
+    ]},
+    {"name": "Wonderland CLOUD MOCK Purchases", "questions": [
+      {"name":"CLOUD MOCK - Purchases and simulated revenue by tier","file":"sql/mock-purchases-by-tier.sql","display":"table"},
+      {"name":"CLOUD MOCK - Purchases and simulated revenue by date","file":"sql/mock-purchases-by-date.sql","display":"table"}
+    ]},
+    {"name": "Wonderland CLOUD MOCK Pipeline Health", "questions": [
+      {"name":"CLOUD MOCK - Totals and reconciliation","file":"sql/totals-reconciliation.sql","display":"table"},
+      {"name":"CLOUD MOCK - Successful cloud polling freshness","file":"sql/cloud-worker-health.sql","display":"table"}
+    ]}
+  ]
+}

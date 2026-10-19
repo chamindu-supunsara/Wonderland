@@ -1,0 +1,8 @@
+{
+  "apiBaseUrl": "/api/v1",
+  "cognito": {
+    "region": "ap-south-1",
+    "userPoolId": "ap-south-1_aBuDlZ9RC",
+    "userPoolClientId": "202ssal4mlube43ttm0j5m3k4i"
+  }
+}

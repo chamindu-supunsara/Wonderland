@@ -1,0 +1,2 @@
+SELECT worker_name,last_polled_at,heartbeat_age_seconds,last_batch_messages,mode
+FROM reporting.cloud_worker_health ORDER BY worker_name;

@@ -1,0 +1,56 @@
+<section class="booking-shell">
+  <span class="eyebrow">MOCK PAYMENT SIMULATOR</span>
+  <h1>Mock checkout <span>✦</span></h1>
+  <p class="notice">
+    Demonstration only. No real charge. No card details are collected. Tickets are not valid for
+    park admission.
+  </p>
+  <nav>
+    <a routerLink="/bookings">My bookings</a
+    ><a [routerLink]="['/bookings', bookingId]">Reservation details</a>
+  </nav>
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+  }
+  @if (checkout(); as row) {
+    <article class="panel">
+      <span class="badge">MOCK · {{ row.status }}</span>
+      <h2>{{ row.booking_reference }}</h2>
+      <strong class="price">{{ row.amount_minor / 100 | currency: row.currency }}</strong>
+      <p>Reservation price snapshot · simulated amount only.</p>
+      @switch (row.status) {
+        @case ('SUCCEEDED') {
+          <p role="status">Mock payment succeeded. Your guest places are confirmed.</p>
+          <a [routerLink]="['/bookings', bookingId, 'tickets']">View demonstration tickets →</a>
+        }
+        @case ('FAILED') {
+          <p role="status">Mock payment failed. Your held guest places have been released.</p>
+          <a routerLink="/book">Make a new reservation →</a>
+        }
+        @case ('REJECTED') {
+          <p role="status">
+            The reservation could not be confirmed. It may have expired or been cancelled. No charge
+            was made.
+          </p>
+        }
+        @default {
+          <p>Choose a result to test. A selected result cannot be changed; retrying it is safe.</p>
+          @if (!chosen() || chosen() === 'success') {
+            <button class="primary" (click)="complete('success')" [disabled]="busy()">
+              {{ chosen() ? 'Retry same mock success' : 'Simulate success' }}
+            </button>
+          }
+          @if (!chosen() || chosen() === 'failure') {
+            <button (click)="complete('failure')" [disabled]="busy()">
+              {{ chosen() ? 'Retry same mock failure' : 'Simulate failure' }}
+            </button>
+          }
+        }
+      }
+    </article>
+  } @else {
+    <button (click)="load()" [disabled]="busy()">
+      {{ busy() ? 'Loading…' : 'Retry loading checkout' }}
+    </button>
+  }
+</section>

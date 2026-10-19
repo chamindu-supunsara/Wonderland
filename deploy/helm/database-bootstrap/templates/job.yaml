@@ -1,0 +1,80 @@
+{{- if ne .Release.Namespace "wonderland-bootstrap" }}{{ fail "Use the dedicated wonderland-bootstrap namespace" }}{{ end }}
+{{- if not (regexMatch "^708919751353[.]dkr[.]ecr[.]ap-south-1[.]amazonaws[.]com/wonderland-demo/catalog@sha256:[a-f0-9]{64}$" .Values.image) }}{{ fail "Use the reviewed catalog repository image pinned by digest" }}{{ end }}
+{{- if not (regexMatch "^wonderland-demo[.][a-z0-9]+[.]ap-south-1[.]rds[.]amazonaws[.]com$" .Values.databaseHost) }}{{ fail "Expected private foundation DB hostname" }}{{ end }}
+{{- if ne (len .Values.serviceSecretArns) 5 }}{{ fail "Provide exactly five existing service secret ARNs" }}{{ end }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: db-bootstrap
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: db-bootstrap-runtime-secret-writer
+  namespace: wonderland
+rules:
+  - apiGroups: ['']
+    resources: [secrets]
+    resourceNames: [wonderland-catalog, wonderland-booking, wonderland-payment, wonderland-admission, wonderland-analytics]
+    verbs: [get, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: db-bootstrap-runtime-secret-writer
+  namespace: wonderland
+subjects:
+  - kind: ServiceAccount
+    name: db-bootstrap
+    namespace: wonderland-bootstrap
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: db-bootstrap-runtime-secret-writer
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 900
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: wonderland-db-bootstrap}
+    spec:
+      serviceAccountName: db-bootstrap
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: bootstrap
+          image: {{ .Values.image | quote }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          env:
+            - {name: AWS_REGION, value: ap-south-1}
+            - {name: AWS_DEFAULT_REGION, value: ap-south-1}
+            - {name: AWS_EC2_METADATA_DISABLED, value: 'true'}
+            - {name: MOCK_PAYMENTS_ENABLED, value: 'true'}
+            - {name: MOCK_ADMISSION_ENABLED, value: 'true'}
+            - {name: DATABASE_HOST, value: {{ .Values.databaseHost | quote }}}
+            - {name: MASTER_SECRET_ARN, value: {{ required "Master secret ARN required" .Values.masterSecretArn | quote }}}
+            - {name: SERVICE_SECRET_ARNS, value: {{ .Values.serviceSecretArns | toJson | quote }}}
+          volumeMounts:
+            - {name: temporary, mountPath: /tmp}
+      volumes:
+        - name: temporary
+          emptyDir: {medium: Memory, sizeLimit: 64Mi}

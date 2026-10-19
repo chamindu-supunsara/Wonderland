@@ -1,0 +1,77 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ExperimentStackLifecycle",
+      "Effect": "Allow",
+      "Action": ["cloudformation:CreateChangeSet", "cloudformation:DeleteChangeSet", "cloudformation:ExecuteChangeSet", "cloudformation:DeleteStack"],
+      "Resource": ["arn:aws:cloudformation:ap-south-1:708919751353:stack/wonderland-step09-mock/*", "arn:aws:cloudformation:ap-south-1:708919751353:changeSet/step09-create/*"]
+    },
+    {
+      "Sid": "ExperimentEksLifecycle",
+      "Effect": "Allow",
+      "Action": ["eks:CreateCluster", "eks:DeleteCluster", "eks:UpdateClusterConfig", "eks:CreateNodegroup", "eks:DeleteNodegroup", "eks:CreateAccessEntry", "eks:DeleteAccessEntry", "eks:AssociateAccessPolicy", "eks:DisassociateAccessPolicy", "eks:TagResource", "eks:UntagResource"],
+      "Resource": ["arn:aws:eks:ap-south-1:708919751353:cluster/wonderland-step09-mock", "arn:aws:eks:ap-south-1:708919751353:nodegroup/wonderland-step09-mock/*/*", "arn:aws:eks:ap-south-1:708919751353:access-entry/wonderland-step09-mock/*"]
+    },
+    {
+      "Sid": "RegionalNetworkAndLaunchTemplateLifecycle",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateVpc", "ec2:DeleteVpc", "ec2:ModifyVpcAttribute", "ec2:CreateInternetGateway", "ec2:DeleteInternetGateway", "ec2:AttachInternetGateway", "ec2:DetachInternetGateway", "ec2:CreateRouteTable", "ec2:DeleteRouteTable", "ec2:CreateRoute", "ec2:DeleteRoute", "ec2:AssociateRouteTable", "ec2:DisassociateRouteTable", "ec2:CreateSubnet", "ec2:DeleteSubnet", "ec2:ModifySubnetAttribute", "ec2:CreateSecurityGroup", "ec2:DeleteSecurityGroup", "ec2:AuthorizeSecurityGroupIngress", "ec2:RevokeSecurityGroupIngress", "ec2:AuthorizeSecurityGroupEgress", "ec2:RevokeSecurityGroupEgress", "ec2:CreateLaunchTemplate", "ec2:DeleteLaunchTemplate", "ec2:CreateLaunchTemplateVersion", "ec2:DeleteLaunchTemplateVersions", "ec2:ModifyLaunchTemplate", "ec2:CreateTags", "ec2:DeleteTags", "ec2:RunInstances", "ec2:TerminateInstances"],
+      "Resource": "*",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-south-1"}}
+    },
+    {
+      "Sid": "RegionalLoadBalancerLifecycle",
+      "Effect": "Allow",
+      "Action": ["elasticloadbalancing:CreateLoadBalancer", "elasticloadbalancing:DeleteLoadBalancer", "elasticloadbalancing:ModifyLoadBalancerAttributes", "elasticloadbalancing:SetSecurityGroups", "elasticloadbalancing:CreateTargetGroup", "elasticloadbalancing:DeleteTargetGroup", "elasticloadbalancing:ModifyTargetGroup", "elasticloadbalancing:ModifyTargetGroupAttributes", "elasticloadbalancing:CreateListener", "elasticloadbalancing:DeleteListener", "elasticloadbalancing:ModifyListener", "elasticloadbalancing:RegisterTargets", "elasticloadbalancing:DeregisterTargets", "elasticloadbalancing:AddTags", "elasticloadbalancing:RemoveTags"],
+      "Resource": "*",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-south-1"}}
+    },
+    {
+      "Sid": "RegionalHttpApiLifecycle",
+      "Effect": "Allow",
+      "Action": "apigateway:*",
+      "Resource": ["arn:aws:apigateway:ap-south-1::/apis*", "arn:aws:apigateway:ap-south-1::/vpclinks*", "arn:aws:apigateway:ap-south-1::/tags/*"]
+    },
+    {
+      "Sid": "ExperimentImageRepository",
+      "Effect": "Allow",
+      "Action": ["ecr:CreateRepository", "ecr:DeleteRepository", "ecr:TagResource", "ecr:UntagResource", "ecr:PutImageScanningConfiguration", "ecr:PutImageTagMutability", "ecr:BatchCheckLayerAvailability", "ecr:InitiateLayerUpload", "ecr:UploadLayerPart", "ecr:CompleteLayerUpload", "ecr:PutImage", "ecr:BatchDeleteImage"],
+      "Resource": "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-step09-mock-*"
+    },
+    {
+      "Sid": "TemporaryRegistryLogin",
+      "Effect": "Allow",
+      "Action": "ecr:GetAuthorizationToken",
+      "Resource": "*",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-south-1"}}
+    },
+    {
+      "Sid": "OnlyExperimentIamRoles",
+      "Effect": "Allow",
+      "Action": ["iam:CreateRole", "iam:DeleteRole", "iam:UpdateAssumeRolePolicy", "iam:TagRole", "iam:UntagRole"],
+      "Resource": ["arn:aws:iam::708919751353:role/wonderland-step09-mock-ClusterRole-*", "arn:aws:iam::708919751353:role/wonderland-step09-mock-NodeRole-*"]
+    },
+    {
+      "Sid": "OnlyRequiredNodeAndClusterPolicies",
+      "Effect": "Allow",
+      "Action": ["iam:AttachRolePolicy", "iam:DetachRolePolicy"],
+      "Resource": ["arn:aws:iam::708919751353:role/wonderland-step09-mock-ClusterRole-*", "arn:aws:iam::708919751353:role/wonderland-step09-mock-NodeRole-*"],
+      "Condition": {"ArnEquals": {"iam:PolicyARN": ["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy", "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy", "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly", "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"]}}
+    },
+    {
+      "Sid": "PassOnlyExperimentRolesToEksOrEc2",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": ["arn:aws:iam::708919751353:role/wonderland-step09-mock-ClusterRole-*", "arn:aws:iam::708919751353:role/wonderland-step09-mock-NodeRole-*"],
+      "Condition": {"StringEquals": {"iam:PassedToService": ["eks.amazonaws.com", "ec2.amazonaws.com"]}}
+    },
+    {
+      "Sid": "RequiredServiceLinkedRoles",
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "*",
+      "Condition": {"StringEquals": {"iam:AWSServiceName": ["eks.amazonaws.com", "eks-nodegroup.amazonaws.com", "autoscaling.amazonaws.com", "elasticloadbalancing.amazonaws.com"]}}
+    }
+  ]
+}

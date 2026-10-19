@@ -1,0 +1,198 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "FoundationEks",
+      "Effect": "Allow",
+      "Action": [
+        "eks:CreateCluster",
+        "eks:DeleteCluster",
+        "eks:UpdateClusterConfig",
+        "eks:CreateNodegroup",
+        "eks:DeleteNodegroup",
+        "eks:CreateAccessEntry",
+        "eks:DeleteAccessEntry",
+        "eks:AssociateAccessPolicy",
+        "eks:DisassociateAccessPolicy",
+        "eks:CreateAddon",
+        "eks:DeleteAddon",
+        "eks:TagResource",
+        "eks:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:eks:ap-south-1:708919751353:cluster/wonderland-demo",
+        "arn:aws:eks:ap-south-1:708919751353:nodegroup/wonderland-demo/application/*",
+        "arn:aws:eks:ap-south-1:708919751353:access-entry/wonderland-demo/*",
+        "arn:aws:eks:ap-south-1:708919751353:addon/wonderland-demo/eks-pod-identity-agent/*"
+      ]
+    },
+    {
+      "Sid": "FoundationRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:TagRole",
+        "iam:UntagRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::708919751353:role/wonderland-demo-cluster",
+        "arn:aws:iam::708919751353:role/wonderland-demo-nodes"
+      ]
+    },
+    {
+      "Sid": "FoundationRolePolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::708919751353:role/wonderland-demo-cluster",
+        "arn:aws:iam::708919751353:role/wonderland-demo-nodes"
+      ],
+      "Condition": {
+        "ArnEquals": {
+          "iam:PolicyARN": [
+            "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+            "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+            "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly",
+            "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "FoundationPassRoles",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": [
+        "arn:aws:iam::708919751353:role/wonderland-demo-cluster",
+        "arn:aws:iam::708919751353:role/wonderland-demo-nodes"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": [
+            "eks.amazonaws.com",
+            "ec2.amazonaws.com"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "FoundationNatAndAddress",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AllocateAddress",
+        "ec2:ReleaseAddress",
+        "ec2:CreateNatGateway",
+        "ec2:DeleteNatGateway"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-south-1"
+        }
+      }
+    },
+    {
+      "Sid": "FoundationDatabase",
+      "Effect": "Allow",
+      "Action": [
+        "rds:CreateDBInstance",
+        "rds:ModifyDBInstance",
+        "rds:DeleteDBInstance",
+        "rds:CreateDBSubnetGroup",
+        "rds:DeleteDBSubnetGroup",
+        "rds:CreateDBParameterGroup",
+        "rds:ModifyDBParameterGroup",
+        "rds:DeleteDBParameterGroup",
+        "rds:CreateDBSnapshot",
+        "rds:AddTagsToResource",
+        "rds:RemoveTagsFromResource"
+      ],
+      "Resource": [
+        "arn:aws:rds:ap-south-1:708919751353:db:wonderland-demo",
+        "arn:aws:rds:ap-south-1:708919751353:subgrp:wonderland-demo",
+        "arn:aws:rds:ap-south-1:708919751353:pg:wonderland-demo-*",
+        "arn:aws:rds:ap-south-1:708919751353:snapshot:wonderland-demo-final-*"
+      ]
+    },
+    {
+      "Sid": "FoundationDefaultOptionGroup",
+      "Effect": "Allow",
+      "Action": "rds:CreateDBInstance",
+      "Resource": "arn:aws:rds:ap-south-1:708919751353:og:default:postgres-16"
+    },
+    {
+      "Sid": "FoundationSecretContainers",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:TagResource",
+        "secretsmanager:UntagResource"
+      ],
+      "Resource": "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/*"
+    },
+    {
+      "Sid": "FoundationSecretRecovery",
+      "Effect": "Allow",
+      "Action": "secretsmanager:DeleteSecret",
+      "Resource": "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/*",
+      "Condition": {
+        "NumericGreaterThanEquals": {
+          "secretsmanager:RecoveryWindowInDays": "7"
+        }
+      }
+    },
+    {
+      "Sid": "FoundationRdsManagedSecret",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:TagResource"
+      ],
+      "Resource": "arn:aws:secretsmanager:ap-south-1:708919751353:secret:rds!db-*"
+    },
+    {
+      "Sid": "FoundationRepositories",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:CreateRepository",
+        "ecr:DeleteRepository",
+        "ecr:TagResource",
+        "ecr:UntagResource",
+        "ecr:PutImageScanningConfiguration",
+        "ecr:PutImageTagMutability"
+      ],
+      "Resource": "arn:aws:ecr:ap-south-1:708919751353:repository/wonderland-demo/*"
+    },
+    {
+      "Sid": "FoundationClusterLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:DeleteLogGroup",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteRetentionPolicy",
+        "logs:TagResource",
+        "logs:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:logs:ap-south-1:708919751353:log-group:/aws/eks/wonderland-demo/cluster",
+        "arn:aws:logs:ap-south-1:708919751353:log-group:/aws/eks/wonderland-demo/cluster:*"
+      ]
+    },
+    {
+      "Sid": "FoundationRdsServiceRole",
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "arn:aws:iam::708919751353:role/aws-service-role/rds.amazonaws.com/AWSServiceRoleForRDS",
+      "Condition": {
+        "StringEquals": {
+          "iam:AWSServiceName": "rds.amazonaws.com"
+        }
+      }
+    }
+  ]
+}

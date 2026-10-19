@@ -1,0 +1,95 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Temporary Step10B private database bootstrap identity. No database or secret deletion resources.",
+  "Resources": {
+    "BootstrapRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "wonderland-demo-db-bootstrap",
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "pods.eks.amazonaws.com"
+              },
+              "Action": [
+                "sts:AssumeRole",
+                "sts:TagSession"
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestTag/kubernetes-namespace": "wonderland-bootstrap",
+                  "aws:RequestTag/kubernetes-service-account": "db-bootstrap",
+                  "aws:RequestTag/eks-cluster-arn": "arn:aws:eks:ap-south-1:708919751353:cluster/wonderland-demo"
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "OnlyDatabaseBootstrapSecrets",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "ReadOnlyThisMaster",
+                  "Effect": "Allow",
+                  "Action": "secretsmanager:GetSecretValue",
+                  "Resource": "arn:aws:secretsmanager:ap-south-1:708919751353:secret:rds!db-1428dad0-d388-45c0-bbd3-baef545c4318-EVaRUF"
+                },
+                {
+                  "Sid": "OnlyFiveServiceCredentials",
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:DescribeSecret",
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:PutSecretValue"
+                  ],
+                  "Resource": [
+                    "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/admission-RU6yj1",
+                    "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/analytics-ftJZv8",
+                    "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/booking-jWgQG2",
+                    "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/catalog-aEgwRe",
+                    "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/payment-WWnpA3"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "Wonderland"
+          },
+          {
+            "Key": "Environment",
+            "Value": "demo"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "temporary-db-bootstrap"
+          }
+        ]
+      }
+    },
+    "PodIdentity": {
+      "Type": "AWS::EKS::PodIdentityAssociation",
+      "Properties": {
+        "ClusterName": "wonderland-demo",
+        "Namespace": "wonderland-bootstrap",
+        "ServiceAccount": "db-bootstrap",
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "BootstrapRole",
+            "Arn"
+          ]
+        }
+      }
+    }
+  }
+}

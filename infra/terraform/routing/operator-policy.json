@@ -1,0 +1,117 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "OneTargetRegistrationController",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy"
+      ],
+      "Resource": "arn:aws:iam::708919751353:role/wonderland-demo-target-controller"
+    },
+    {
+      "Sid": "PassOnlyTargetController",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::708919751353:role/wonderland-demo-target-controller",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "pods.eks.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "OnlyDemoListenerRules",
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:CreateRule",
+        "elasticloadbalancing:ModifyRule",
+        "elasticloadbalancing:DeleteRule",
+        "elasticloadbalancing:SetRulePriorities"
+      ],
+      "Resource": [
+        "arn:aws:elasticloadbalancing:ap-south-1:708919751353:listener/app/wonderland-demo-edge/*/*",
+        "arn:aws:elasticloadbalancing:ap-south-1:708919751353:listener-rule/app/wonderland-demo-edge/*/*/*"
+      ]
+    },
+    {
+      "Sid": "CreateTaggedFrontend",
+      "Effect": "Allow",
+      "Action": "amplify:CreateApp",
+      "Resource": "arn:aws:amplify:ap-south-1:708919751353:apps/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Project": "Wonderland"
+        }
+      }
+    },
+    {
+      "Sid": "MumbaiFrontendAppLifecycle",
+      "Effect": "Allow",
+      "Action": [
+        "amplify:UpdateApp",
+        "amplify:DeleteApp",
+        "amplify:CreateBranch",
+        "amplify:TagResource",
+        "amplify:UntagResource"
+      ],
+      "Resource": "arn:aws:amplify:ap-south-1:708919751353:apps/*"
+    },
+    {
+      "Sid": "MainBranchDeployment",
+      "Effect": "Allow",
+      "Action": [
+        "amplify:UpdateBranch",
+        "amplify:DeleteBranch",
+        "amplify:CreateDeployment",
+        "amplify:StartDeployment",
+        "amplify:StopJob"
+      ],
+      "Resource": [
+        "arn:aws:amplify:ap-south-1:708919751353:apps/*/branches/main",
+        "arn:aws:amplify:ap-south-1:708919751353:apps/*/branches/main/jobs/*",
+        "arn:aws:amplify:ap-south-1:708919751353:apps/d3vt08cs3xnlse/branches/main/deployments/*"
+      ]
+    },
+    {
+      "Sid": "GatewayLogsOnly",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:DeleteLogGroup",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteRetentionPolicy",
+        "logs:TagResource",
+        "logs:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:logs:ap-south-1:708919751353:log-group:/aws/apigateway/wonderland-demo-public",
+        "arn:aws:logs:ap-south-1:708919751353:log-group:/aws/apigateway/wonderland-demo-public:*"
+      ]
+    },
+    {
+      "Sid": "MumbaiGatewayLogDelivery",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-south-1"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="site-header">
+  <a class="brand" routerLink="/" aria-label="Wonderland home"
+    ><span class="brand-mark" aria-hidden="true">w<span>✦</span></span
+    >wonderland<span class="brand-dot">.</span></a
+  >
+  <nav aria-label="Main navigation">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      >Explore the park</a
+    ><a routerLink="/tickets" routerLinkActive="active">Tickets &amp; tiers</a>
+    <a [routerLink]="auth.user() ? '/account' : '/login'" routerLinkActive="active">{{ auth.user() ? 'My account' : 'Sign in' }}</a>
+  </nav>
+  <a class="header-cta" routerLink="/tickets"
+    >Find your adventure <span aria-hidden="true">↗</span></a
+  >
+</header>
+<main id="main-content" tabindex="-1"><router-outlet /></main>
+<footer class="site-footer">
+  <a class="brand footer-brand" routerLink="/">wonderland.</a>
+  <p>A little adventure. A lot of memories.</p>
+  <span>Wonderland theme park</span>
+</footer>

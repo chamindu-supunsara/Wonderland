@@ -1,0 +1,25 @@
+:host { display: block; }
+.auth-layout { display: grid; grid-template-columns: 1fr 1fr; max-width: 1200px; margin: 3rem auto; padding: 0 2rem; gap: 5rem; }
+.auth-story { background: #183d31; color: #fbf8ef; border-radius: 2rem; padding: 3rem; position: relative; overflow: hidden; }
+.eyebrow { font-size: .72rem; letter-spacing: .16em; font-weight: 700; }
+h1 { font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.08; font-weight: 500; margin: 2rem 0 1.5rem; }
+h1 span { color: #edb6ca; }
+.auth-story p { line-height: 1.8; max-width: 23rem; color: #d8e1d7; }
+.auth-story a { color: inherit; }
+.orbit { font-size: 10rem; line-height: 1; text-align: center; color: #edb6ca; padding: 2rem; transform: rotate(-12deg); }
+.orbit span { font-size: 5rem; color: #f4d974; }
+.auth-card { padding: 2rem 0; max-width: 440px; width: 100%; }
+h2 { font-size: 2.5rem; font-weight: 500; line-height: 1.1; margin: 1rem 0 2rem; }
+form { display: grid; gap: .65rem; }
+label { font-size: .88rem; font-weight: 600; margin-top: .65rem; }
+input { width: 100%; border: 1px solid #acb9ae; border-radius: .65rem; padding: .85rem 1rem; background: #fffefa; color: #183d31; font: inherit; }
+input:focus { outline: 3px solid #e9c36a; outline-offset: 2px; }
+.help, .privacy-note { font-size: .8rem; line-height: 1.6; color: #5c6d62; margin: 0; }
+.submit { background: #183d31; color: white; border: 0; border-radius: 2rem; padding: 1rem; font: inherit; margin-top: 1.2rem; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+.auth-links { display: grid; gap: 1rem; margin: 1.5rem 0; font-size: .88rem; }
+.auth-links a, .text-button { color: #183d31; }
+.text-button { background: none; border: 0; padding: 1rem 0 0; text-decoration: underline; cursor: pointer; font: inherit; }
+.notice { background: #e7eddf; padding: 1rem; border-radius: .65rem; line-height: 1.5; }
+.error { background: #f8dfdf; color: #722d2d; }
+@media (max-width: 760px) { .auth-layout { grid-template-columns: 1fr; gap: 1rem; margin: 1rem auto; padding: 0 1rem; } .auth-story { padding: 2rem; } .orbit { display: none; } h1 { margin: 1rem 0; } .auth-card { max-width: none; padding: 1rem; } }

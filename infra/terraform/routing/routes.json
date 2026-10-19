@@ -1,0 +1,118 @@
+{
+  "GET /api/v1/admin/access-check": {
+    "service": "catalog",
+    "public": false
+  },
+  "GET /api/v1/admin/attractions": {
+    "service": "catalog",
+    "public": false
+  },
+  "GET /api/v1/admin/audit": {
+    "service": "catalog",
+    "public": false
+  },
+  "GET /api/v1/admin/ticket-tiers": {
+    "service": "catalog",
+    "public": false
+  },
+  "GET /api/v1/admin/ticket-tiers/{tier_id}/prices": {
+    "service": "catalog",
+    "public": false
+  },
+  "GET /api/v1/admissions/staff/tickets/{reference}": {
+    "service": "admission",
+    "public": false
+  },
+  "GET /api/v1/admissions/visits/me": {
+    "service": "admission",
+    "public": false
+  },
+  "GET /api/v1/admissions/visits/{visit_id}/rides": {
+    "service": "admission",
+    "public": false
+  },
+  "GET /api/v1/attractions": {
+    "service": "catalog",
+    "public": true
+  },
+  "GET /api/v1/attractions/{attraction_id}": {
+    "service": "catalog",
+    "public": true
+  },
+  "GET /api/v1/booking-policy": {
+    "service": "booking",
+    "public": false
+  },
+  "GET /api/v1/bookings/me": {
+    "service": "booking",
+    "public": false
+  },
+  "GET /api/v1/bookings/{booking_id}": {
+    "service": "booking",
+    "public": false
+  },
+  "GET /api/v1/bookings/{booking_id}/tickets": {
+    "service": "booking",
+    "public": false
+  },
+  "GET /api/v1/payments/checkouts/{checkout_id}": {
+    "service": "payment",
+    "public": false
+  },
+  "GET /api/v1/ticket-tiers": {
+    "service": "catalog",
+    "public": true
+  },
+  "GET /api/v1/users/me": {
+    "service": "catalog",
+    "public": false
+  },
+  "GET /api/v1/visit-slots": {
+    "service": "booking",
+    "public": false
+  },
+  "POST /api/v1/admin/attractions": {
+    "service": "catalog",
+    "public": false
+  },
+  "POST /api/v1/admin/attractions/{attraction_id}/retire": {
+    "service": "catalog",
+    "public": false
+  },
+  "POST /api/v1/admin/ticket-tiers/{tier_id}/prices": {
+    "service": "catalog",
+    "public": false
+  },
+  "POST /api/v1/admin/visit-slots": {
+    "service": "booking",
+    "public": false
+  },
+  "POST /api/v1/admissions/staff/check-ins": {
+    "service": "admission",
+    "public": false
+  },
+  "POST /api/v1/admissions/staff/ride-uses": {
+    "service": "admission",
+    "public": false
+  },
+  "POST /api/v1/bookings": {
+    "service": "booking",
+    "public": false
+  },
+  "POST /api/v1/bookings/{booking_id}/cancel": {
+    "service": "booking",
+    "public": false
+  },
+  "POST /api/v1/payments/checkouts": {
+    "service": "payment",
+    "public": false
+  },
+  "POST /api/v1/payments/checkouts/{checkout_id}/complete": {
+    "service": "payment",
+    "public": false
+  },
+  "PUT /api/v1/admin/attractions/{attraction_id}": {
+    "service": "catalog",
+    "public": false
+  }
+}

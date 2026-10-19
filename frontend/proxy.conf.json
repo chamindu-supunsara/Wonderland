@@ -1,0 +1,39 @@
+{
+  "/api/v1/admissions/**": {
+    "target": "http://127.0.0.1:8004",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/admin/mock-tickets/**": {
+    "target": "http://127.0.0.1:8002",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/payments/**": {
+    "target": "http://127.0.0.1:8003",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/bookings/**": {
+    "target": "http://127.0.0.1:8002",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/bookings": { "target": "http://127.0.0.1:8002", "secure": false, "changeOrigin": true },
+  "/api/v1/visit-slots": {
+    "target": "http://127.0.0.1:8002",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/booking-policy": {
+    "target": "http://127.0.0.1:8002",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/admin/visit-slots": {
+    "target": "http://127.0.0.1:8002",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/**": { "target": "http://127.0.0.1:8001", "secure": false, "changeOrigin": true }
+}

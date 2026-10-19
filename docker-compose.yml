@@ -1,0 +1,318 @@
+name: wonderland
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: wonderland
+      POSTGRES_USER: wonderland_local_admin
+      POSTGRES_PASSWORD: local_bootstrap_only
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - wonderland_postgres:/var/lib/postgresql/data
+      - ./deploy/local/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wonderland_local_admin -d wonderland"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  catalog-migrate:
+    build:
+      context: .
+      dockerfile: services/catalog/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://catalog_dev:catalog_dev_only@postgres:5432/wonderland
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  catalog-seed:
+    build:
+      context: .
+      dockerfile: services/catalog/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://catalog_dev:catalog_dev_only@postgres:5432/wonderland
+    command: ["python", "-m", "app.seed"]
+    depends_on:
+      catalog-migrate:
+        condition: service_completed_successfully
+
+  catalog:
+    build:
+      context: .
+      dockerfile: services/catalog/Dockerfile
+    env_file:
+      - path: ./services/catalog/.env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://catalog_dev:catalog_dev_only@postgres:5432/wonderland
+    ports:
+      - "127.0.0.1:8001:8000"
+    depends_on:
+      catalog-seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=6)"]
+      interval: 10s
+      timeout: 8s
+      retries: 5
+
+  booking-bootstrap:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: local_bootstrap_only
+    volumes:
+      - ./deploy/local/postgres/003-booking.sql:/bootstrap.sql:ro
+    command: ["psql", "-h", "postgres", "-U", "wonderland_local_admin", "-d", "wonderland", "-v", "ON_ERROR_STOP=1", "-f", "/bootstrap.sql"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  booking-migrate:
+    build:
+      context: .
+      dockerfile: services/booking/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://booking_dev:booking_dev_only@postgres:5432/wonderland
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      booking-bootstrap:
+        condition: service_completed_successfully
+
+  booking-seed:
+    build:
+      context: .
+      dockerfile: services/booking/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://booking_dev:booking_dev_only@postgres:5432/wonderland
+    command: ["python", "-m", "booking_app.seed"]
+    depends_on:
+      booking-migrate:
+        condition: service_completed_successfully
+
+  booking:
+    build:
+      context: .
+      dockerfile: services/booking/Dockerfile
+    env_file:
+      - path: ./services/booking/.env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://booking_dev:booking_dev_only@postgres:5432/wonderland
+      CATALOG_URL: http://catalog:8000
+      MOCK_PAYMENTS_ENABLED: "true"
+    ports:
+      - "127.0.0.1:8002:8000"
+    depends_on:
+      booking-seed:
+        condition: service_completed_successfully
+      catalog:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=6)"]
+      interval: 10s
+      timeout: 8s
+      retries: 5
+
+  booking-maintenance:
+    build:
+      context: .
+      dockerfile: services/booking/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://booking_dev:booking_dev_only@postgres:5432/wonderland
+    command: ["python", "-m", "booking_app.maintenance"]
+    restart: on-failure
+    depends_on:
+      booking-seed:
+        condition: service_completed_successfully
+
+  events-bootstrap:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: local_bootstrap_only
+    volumes:
+      - ./deploy/local/postgres/004-analytics.sql:/bootstrap.sql:ro
+    command: ["psql", "-h", "postgres", "-U", "wonderland_local_admin", "-d", "wonderland", "-v", "ON_ERROR_STOP=1", "-f", "/bootstrap.sql"]
+    depends_on:
+      booking-bootstrap:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+
+  analytics-migrate:
+    build:
+      context: .
+      dockerfile: services/analytics/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://analytics_dev:analytics_dev_only@postgres:5432/wonderland
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      events-bootstrap:
+        condition: service_completed_successfully
+
+  payment-bootstrap:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: local_bootstrap_only
+    volumes:
+      - ./deploy/local/postgres/005-payment.sql:/bootstrap.sql:ro
+    command: ["psql", "-h", "postgres", "-U", "wonderland_local_admin", "-d", "wonderland", "-v", "ON_ERROR_STOP=1", "-f", "/bootstrap.sql"]
+    depends_on:
+      events-bootstrap:
+        condition: service_completed_successfully
+
+  payment-migrate:
+    build:
+      context: .
+      dockerfile: services/payment/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://payment_dev:payment_dev_only@postgres:5432/wonderland
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      payment-bootstrap:
+        condition: service_completed_successfully
+
+  payment:
+    build:
+      context: .
+      dockerfile: services/payment/Dockerfile
+    env_file:
+      - path: ./services/payment/.env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://payment_dev:payment_dev_only@postgres:5432/wonderland
+      BOOKING_URL: http://booking:8000
+      MOCK_PAYMENTS_ENABLED: "true"
+    ports:
+      - "127.0.0.1:8003:8000"
+    depends_on:
+      payment-migrate:
+        condition: service_completed_successfully
+      booking:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=6)"]
+      interval: 10s
+      timeout: 8s
+      retries: 5
+
+  admission-bootstrap:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: local_bootstrap_only
+    volumes:
+      - ./deploy/local/postgres/006-admission.sql:/bootstrap.sql:ro
+    command: ["psql", "-h", "postgres", "-U", "wonderland_local_admin", "-d", "wonderland", "-v", "ON_ERROR_STOP=1", "-f", "/bootstrap.sql"]
+    depends_on:
+      payment-bootstrap:
+        condition: service_completed_successfully
+
+  admission-migrate:
+    build:
+      context: .
+      dockerfile: services/admission/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://admission_dev:admission_dev_only@postgres:5432/wonderland
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      admission-bootstrap:
+        condition: service_completed_successfully
+
+  admission:
+    build:
+      context: .
+      dockerfile: services/admission/Dockerfile
+    env_file:
+      - path: ./services/admission/.env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://admission_dev:admission_dev_only@postgres:5432/wonderland
+      BOOKING_URL: http://booking:8000
+      CATALOG_URL: http://catalog:8000
+      MOCK_ADMISSION_ENABLED: "true"
+    ports:
+      - "127.0.0.1:8004:8000"
+    depends_on:
+      admission-migrate:
+        condition: service_completed_successfully
+      booking:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=6)"]
+      interval: 10s
+      timeout: 8s
+      retries: 5
+
+  reporting-bootstrap:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: local_bootstrap_only
+    volumes:
+      - ./deploy/local/postgres/007-reporting-roles.sql:/bootstrap.sql:ro
+    command: ["psql", "-h", "postgres", "-U", "wonderland_local_admin", "-d", "wonderland", "-v", "ON_ERROR_STOP=1", "-f", "/bootstrap.sql"]
+    depends_on:
+      admission-bootstrap:
+        condition: service_completed_successfully
+
+  reporting-grants:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: local_bootstrap_only
+    volumes:
+      - ./deploy/local/reporting/privileges.sql:/privileges.sql:ro
+    command: ["psql", "-h", "postgres", "-U", "wonderland_local_admin", "-d", "wonderland", "-v", "ON_ERROR_STOP=1", "-f", "/privileges.sql"]
+    depends_on:
+      reporting-bootstrap:
+        condition: service_completed_successfully
+      admission-migrate:
+        condition: service_completed_successfully
+      analytics-migrate:
+        condition: service_completed_successfully
+
+  analytics-mock:
+    build:
+      context: .
+      dockerfile: services/analytics/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://analytics_dev:analytics_dev_only@postgres:5432/wonderland
+      ADMISSION_FEED_DATABASE_URL: postgresql+psycopg://analytics_source_dev:analytics_source_dev_only@postgres:5432/wonderland
+      MOCK_ANALYTICS_ENABLED: "true"
+    command: ["python", "-m", "analytics_app.mock_pipeline"]
+    restart: on-failure
+    depends_on:
+      reporting-grants:
+        condition: service_completed_successfully
+
+  metabase:
+    image: metabase/metabase:v0.64.1.x
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: wonderland_metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase_app
+      MB_DB_PASS: metabase_app_local_only
+      MB_DB_HOST: postgres
+      MB_SITE_NAME: Wonderland MOCK Analytics
+      MB_SITE_URL: http://127.0.0.1:3000
+      MB_ANON_TRACKING_ENABLED: "false"
+      MB_REPORT_TIMEZONE: Asia/Colombo
+      JAVA_TIMEZONE: Asia/Colombo
+      JAVA_OPTS: -Xmx1g
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      reporting-grants:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 120s
+
+volumes:
+  wonderland_postgres:
+

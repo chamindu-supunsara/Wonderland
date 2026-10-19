@@ -1,0 +1,116 @@
+<div class="page-container">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <span class="eyebrow">A day out of the ordinary</span>
+      <h1 id="hero-title">Make room for<br />a little <span>wonder.</span></h1>
+      <p>Big thrills. Little discoveries. The kind of day you'll talk about all the way home.</p>
+      <a class="button" href="#experiences"
+        >Explore the experiences <span aria-hidden="true">↗</span></a
+      >
+      <div class="hero-note">
+        <span aria-hidden="true">✦</span> Your people. Your pace. Your perfect park day.
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <span class="sun"></span><span class="hill hill-back"></span
+      ><span class="hill hill-front"></span>
+      <div class="wheel">
+        <span class="spoke s1"></span><span class="spoke s2"></span><span class="spoke s3"></span
+        ><span class="spoke s4"></span><span class="hub"></span>
+      </div>
+      <span class="wheel-support left"></span><span class="wheel-support right"></span
+      ><span class="floating-label">A little more <em>adventure</em></span
+      ><span class="art-star">✳</span><span class="park-label">GOOD DAYS<br />START HERE.</span>
+    </div>
+  </section>
+  <div class="intro-strip">
+    <span>Something for every kind of adventurer</span><span aria-hidden="true">✦</span
+    ><span>From first rides to big thrills</span><span aria-hidden="true">✦</span
+    ><span>Make memories together</span>
+  </div>
+  <section id="experiences" class="experiences" aria-labelledby="experiences-title">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Find your kind of fun</span>
+        <h2 id="experiences-title">Pick your next “one more go.”</h2>
+      </div>
+      <p>Explore at your own pace.</p>
+    </div>
+    <div class="filters" role="group" aria-label="Filter attractions by category">
+      @for (category of categories; track category.value) {
+        <button
+          type="button"
+          [class.selected]="selectedCategory() === category.value"
+          [attr.aria-pressed]="selectedCategory() === category.value"
+          (click)="selectedCategory.set(category.value)"
+        >
+          {{ category.label }}
+        </button>
+      }
+    </div>
+    @if (loading()) {
+      <p class="status-message" role="status">Finding your next adventure…</p>
+    } @else if (error()) {
+      <div class="status-message error" role="alert">
+        <h3>We couldn't load the experiences.</h3>
+        <p>Please try again in a moment.</p>
+        <button type="button" (click)="load()">Try again</button>
+      </div>
+    } @else {
+      <p class="results-count" aria-live="polite">
+        {{ filteredAttractions().length }}
+        {{ filteredAttractions().length === 1 ? 'experience' : 'experiences' }} to discover
+      </p>
+      <div class="attraction-grid">
+        @for (ride of filteredAttractions(); track ride.id) {
+          <article class="ride-card">
+            <div class="ride-art" [attr.data-category]="ride.category" aria-hidden="true">
+              <span class="art-number">0{{ $index + 1 }}</span
+              ><span class="ride-symbol">{{
+                ride.category === 'WATER'
+                  ? '≈'
+                  : ride.category === 'KIDS'
+                    ? '✿'
+                    : ride.category === 'INTERACTIVE'
+                      ? '✳'
+                      : '↗'
+              }}</span
+              ><span class="thrill-tag">{{ ride.thrill_level.toLowerCase() }} thrill</span>
+            </div>
+            <div class="ride-content">
+              <span class="eyebrow">{{ categoryLabel(ride.category) }}</span>
+              <h3>{{ ride.name }}</h3>
+              <p>{{ ride.description }}</p>
+              <div class="suitability">
+                <span>{{ ride.min_age === null ? 'All ages' : 'Ages ' + ride.min_age + '+' }}</span
+                ><span>{{
+                  ride.min_height_cm === null
+                    ? 'No minimum height'
+                    : ride.min_height_cm + ' cm minimum'
+                }}</span>
+              </div>
+              <details>
+                <summary>Before you ride</summary>
+                <p>{{ ride.guidance_text }}</p>
+              </details>
+            </div>
+          </article>
+        } @empty {
+          <p class="status-message">
+            No experiences in this category right now. Try another category.
+          </p>
+        }
+      </div>
+    }
+  </section>
+  <section class="tickets-banner">
+    <div>
+      <span class="eyebrow">Better days, together</span>
+      <h2>One park. Your favourite people.</h2>
+      <p>Find a ticket tier for a solo adventure, a date, or the whole crew.</p>
+    </div>
+    <a class="button" routerLink="/tickets"
+      >Explore ticket tiers <span aria-hidden="true">↗</span></a
+    >
+  </section>
+</div>

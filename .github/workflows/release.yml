@@ -1,0 +1,69 @@
+name: Mock release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: wonderland-mock-release
+  cancel-in-progress: false
+jobs:
+  checks:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/checks.yml
+    permissions:
+      contents: read
+  publish:
+    needs: checks
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22.19.0'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npx --yes npm@11.6.2 ci && npm run build
+        working-directory: frontend
+      - uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c # v4
+        with:
+          role-to-assume: arn:aws:iam::708919751353:role/wonderland-github-release
+          aws-region: ap-south-1
+          allowed-account-ids: '708919751353'
+          role-duration-seconds: 3600
+          role-session-name: gh-${{ github.run_id }}-${{ github.run_attempt }}
+          mask-aws-account-id: true
+      - name: Build and push immutable images to existing repositories
+        shell: bash
+        env:
+          REGISTRY: 708919751353.dkr.ecr.ap-south-1.amazonaws.com
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          trap 'docker logout "$REGISTRY" >/dev/null 2>&1 || true' EXIT
+          aws ecr get-login-password | docker login --username AWS --password-stdin "$REGISTRY"
+          for service in catalog booking payment admission analytics; do
+            repo="wonderland-demo/$service"
+            tag="gh-${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+            docker build --platform linux/amd64 -f "services/$service/Dockerfile" -t "$REGISTRY/$repo:$tag" .
+            docker push "$REGISTRY/$repo:$tag"
+            digest=$(aws ecr describe-images --repository-name "$repo" --image-ids "imageTag=$tag" --query 'imageDetails[0].imageDigest' --output text)
+            printf '%s %s\n' "$service" "$REGISTRY/$repo@$digest" >> release/images.txt
+          done
+          python -c 'import json,pathlib; p=pathlib.Path("release"); (p/"images.json").write_text(json.dumps(dict(x.split() for x in (p/"images.txt").read_text().splitlines()))); (p/"images.txt").unlink()'
+      - run: python scripts/ci/release.py release
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mock-release-${{ github.run_id }}-${{ github.run_attempt }}
+          path: release/
+          if-no-files-found: error
+          retention-days: 7

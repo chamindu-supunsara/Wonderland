@@ -1,0 +1,55 @@
+# Render-only until database bootstrap, migrations, secrets and workload IAM are ready.
+enabled: false
+frontendOrigin: ""
+pricingMode: http
+cognito:
+  region: ap-south-1
+  userPoolId: ap-south-1_aBuDlZ9RC
+  userPoolClientId: 202ssal4mlube43ttm0j5m3k4i
+images:
+  catalog: ""
+  booking: ""
+  payment: ""
+  admission: ""
+  analytics: ""
+apiReplicas: 2
+apis:
+  catalog: {enabled: true}
+  booking: {enabled: true}
+  payment: {enabled: true}
+  admission: {enabled: true}
+secrets:
+  catalog: wonderland-catalog
+  booking: wonderland-booking
+  payment: wonderland-payment
+  admission: wonderland-admission
+  analytics: wonderland-analytics
+workers:
+  booking-maintenance:
+    enabled: false
+    service: booking
+    command: [python, -m, booking_app.maintenance]
+  catalog-publisher:
+    enabled: false
+    service: catalog
+    command: [python, -m, app.event_worker, publish]
+  booking-publisher:
+    enabled: false
+    service: booking
+    command: [python, -m, booking_app.event_worker, publish]
+  booking-prices:
+    enabled: false
+    service: booking
+    command: [python, -m, booking_app.event_worker, consume-prices]
+  analytics-bookings:
+    enabled: false
+    service: analytics
+    command: [python, -m, analytics_app.worker]
+  admission-publisher:
+    enabled: false
+    service: admission
+    command: [python, -m, admission_app.event_worker, publish]
+  analytics-admissions:
+    enabled: false
+    service: analytics
+    command: [python, -m, analytics_app.admission_worker]

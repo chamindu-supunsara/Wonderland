@@ -1,0 +1,404 @@
+<section class="admin-shell">
+  @if (localAnalytics) {
+    <a href="http://127.0.0.1:3000" target="_blank" rel="noopener">Open local MOCK analytics in Metabase ↗</a>
+  } @else {
+    <p>Analytics is not connected in this environment yet.</p>
+  }
+  <a routerLink="/admin/admission">Mock guest check-in and ride usage →</a>
+  <a routerLink="/admin/slots">Manage visit slots and capacity →</a>
+  <header class="admin-heading">
+    <div>
+      <span class="eyebrow">WONDERLAND · ADMINISTRATOR</span>
+      <h1>Make every visit<br />a great one<span>✦</span></h1>
+      <p>Manage the park’s experiences and package prices.</p>
+    </div>
+    <a routerLink="/account" class="quiet-button">My account ↗</a>
+  </header>
+  <div class="summary">
+    <span
+      ><strong>{{ activeCount() }}</strong> Active attractions</span
+    ><span
+      ><strong>{{ attractions().length - activeCount() }}</strong> Retired records</span
+    ><span
+      ><strong>{{ tiers().length }}</strong> Ticket tiers</span
+    >
+  </div>
+  <nav class="admin-tabs" aria-label="Administrator sections">
+    <button
+      type="button"
+      [class.selected]="section() === 'attractions'"
+      [attr.aria-pressed]="section() === 'attractions'"
+      (click)="section.set('attractions')"
+      [disabled]="saving()"
+    >
+      Attractions
+    </button>
+    <button
+      type="button"
+      [class.selected]="section() === 'pricing'"
+      [attr.aria-pressed]="section() === 'pricing'"
+      (click)="section.set('pricing')"
+      [disabled]="saving()"
+    >
+      Ticket pricing
+    </button>
+    <button
+      type="button"
+      [class.selected]="section() === 'activity'"
+      [attr.aria-pressed]="section() === 'activity'"
+      (click)="section.set('activity')"
+      [disabled]="saving()"
+    >
+      Recent activity
+    </button>
+  </nav>
+  @if (notice()) {
+    <p class="notice success" role="status">{{ notice() }}</p>
+  }
+  @if (error()) {
+    <div class="notice error" role="alert">
+      <p>{{ error() }}</p>
+      <button type="button" (click)="reloadLatest()" [disabled]="saving() || loading()">
+        Reload latest data (discard form)</button
+      ><a routerLink="/account">My account</a>
+    </div>
+  }
+  @if (loading()) {
+    <p role="status">Loading park records…</p>
+  }
+  @if (section() === 'attractions') {
+    <div class="section-heading">
+      <div>
+        <h2>Park attractions</h2>
+        <p>Retirement removes an experience from public browsing and keeps its history.</p>
+      </div>
+      <button
+        type="button"
+        class="primary"
+        (click)="begin('new')"
+        [disabled]="saving() || loading()"
+      >
+        + Add attraction
+      </button>
+    </div>
+    @if (editor()) {
+      <section class="editor" aria-labelledby="editor-title">
+        <span class="eyebrow">EXPERIENCE DETAILS</span>
+        <h3 id="editor-title">{{ editingName() }}</h3>
+        <form #attractionForm="ngForm" (ngSubmit)="attractionForm.valid && saveAttraction()">
+          <fieldset [disabled]="saving()">
+            <div class="form-grid">
+              <div class="wide">
+                <label for="ride-name">Attraction name</label
+                ><input
+                  id="ride-name"
+                  name="name"
+                  [(ngModel)]="draft.name"
+                  required
+                  maxlength="120"
+                />
+              </div>
+              <div class="wide">
+                <label for="description">Description</label
+                ><textarea
+                  id="description"
+                  name="description"
+                  [(ngModel)]="draft.description"
+                  required
+                  maxlength="5000"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div>
+                <label for="category">Category</label
+                ><select id="category" name="category" [(ngModel)]="draft.category" required>
+                  @for (category of categories; track category.code) {
+                    <option [value]="category.code">{{ category.label }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label for="thrill">Thrill level</label
+                ><select id="thrill" name="thrill" [(ngModel)]="draft.thrill_level" required>
+                  <option value="LOW">Low</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HIGH">High</option>
+                </select>
+              </div>
+              <div>
+                <label for="age">Minimum age (optional)</label
+                ><input
+                  id="age"
+                  name="age"
+                  type="number"
+                  [(ngModel)]="draft.min_age"
+                  min="0"
+                  max="120"
+                  step="1"
+                /><small>Whole years, 0–120. Leave blank for no age minimum.</small>
+              </div>
+              <div>
+                <label for="height">Minimum height in cm (optional)</label
+                ><input
+                  id="height"
+                  name="height"
+                  type="number"
+                  [(ngModel)]="draft.min_height_cm"
+                  min="0"
+                  max="300"
+                  step="1"
+                /><small>Whole centimetres, 0–300. Leave blank for no height minimum.</small>
+              </div>
+              <div class="wide">
+                <label for="guidance">Visitor guidance</label
+                ><textarea
+                  id="guidance"
+                  name="guidance"
+                  [(ngModel)]="draft.guidance_text"
+                  required
+                  maxlength="2000"
+                  rows="2"
+                ></textarea>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit" [disabled]="!attractionForm.valid || saving()">
+                {{ saving() ? 'Saving…' : 'Save attraction' }}</button
+              ><button type="button" (click)="editor.set(null)">Cancel</button>
+            </div>
+          </fieldset>
+        </form>
+      </section>
+    }
+    @if (retirement(); as ride) {
+      <section class="retire-confirm" role="region" aria-label="Confirm retirement">
+        <h3>Retire {{ ride.name }}?</h3>
+        <p>
+          This hides the attraction from visitors. The stored record and audit history remain.
+          Retired records are read only.
+        </p>
+        <div class="actions">
+          <button class="danger" type="button" (click)="retire()" [disabled]="saving()">
+            {{ saving() ? 'Retiring…' : 'Confirm retirement' }}</button
+          ><button type="button" (click)="retirement.set(null)" [disabled]="saving()">
+            Cancel
+          </button>
+        </div>
+      </section>
+    }
+    <div class="filters">
+      <div>
+        <label for="search">Search attractions</label
+        ><input
+          id="search"
+          type="search"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          placeholder="Search by name or description"
+        />
+      </div>
+      <div>
+        <label for="status">Show status</label
+        ><select id="status" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+          <option value="ALL">All records</option>
+          <option value="ACTIVE">Active</option>
+          <option value="RETIRED">Retired</option>
+        </select>
+      </div>
+    </div>
+    <div class="attraction-list">
+      @for (ride of filtered(); track ride.id) {
+        <article class="ride-card">
+          <div class="ride-top">
+            <span class="category"
+              >{{ categoryLabel(ride.category) }} ·
+              {{ ride.thrill_level.toLowerCase() }} thrill</span
+            ><span class="badge" [class.retired]="ride.status === 'RETIRED'">{{
+              ride.status === 'ACTIVE' ? 'Active' : 'Retired'
+            }}</span>
+          </div>
+          <h3>{{ ride.name }}</h3>
+          <p>{{ ride.description }}</p>
+          <dl>
+            <div>
+              <dt>Minimum age</dt>
+              <dd>{{ ride.min_age === null ? 'None specified' : ride.min_age + ' years' }}</dd>
+            </div>
+            <div>
+              <dt>Minimum height</dt>
+              <dd>
+                {{ ride.min_height_cm === null ? 'None specified' : ride.min_height_cm + ' cm' }}
+              </dd>
+            </div>
+          </dl>
+          <p class="guidance">{{ ride.guidance_text }}</p>
+          <footer>
+            <small
+              >Revision {{ ride.revision }} · Updated {{ ride.updated_at | date: 'medium' }}</small
+            >
+            @if (ride.status === 'ACTIVE') {
+              <div class="actions">
+                <button
+                  type="button"
+                  (click)="begin(ride)"
+                  [disabled]="saving() || loading()"
+                  [attr.aria-label]="'Edit ' + ride.name"
+                >
+                  Edit</button
+                ><button
+                  class="retire-link"
+                  type="button"
+                  (click)="retirement.set(ride); editor.set(null); error.set('')"
+                  [disabled]="saving() || loading()"
+                  [attr.aria-label]="'Retire ' + ride.name"
+                >
+                  Retire
+                </button>
+              </div>
+            }
+          </footer>
+        </article>
+      } @empty {
+        @if (!loading()) {
+          <p class="notice">No attractions match this view.</p>
+        }
+      }
+    </div>
+  }
+  @if (section() === 'pricing') {
+    <div class="section-heading">
+      <div>
+        <h2>Ticket pricing</h2>
+        <p>Prices are per package in USD. Publish a new version to change a price.</p>
+      </div>
+    </div>
+    <div class="pricing-layout">
+      <div class="tier-list">
+        @for (tier of tiers(); track tier.id) {
+          <button
+            class="tier-card"
+            type="button"
+            (click)="selectTier(tier)"
+            [class.chosen]="selectedTier()?.id === tier.id"
+            [attr.aria-pressed]="selectedTier()?.id === tier.id"
+            [disabled]="saving() || loading()"
+          >
+            <span class="eyebrow">{{ tier.code }}</span
+            ><strong>{{ tier.name }}</strong
+            ><span>{{ tier.amount_minor / 100 | currency: tier.currency }}</span
+            ><small
+              >{{ tier.min_guests }}–{{ tier.max_guests }} guests · Version
+              {{ tier.price_version }}</small
+            >
+          </button>
+        }
+      </div>
+      <section class="price-editor">
+        @if (selectedTier(); as tier) {
+          <span class="eyebrow">PACKAGE PRICE</span>
+          <h3>{{ tier.name }}</h3>
+          <p>
+            Current: <strong>{{ tier.amount_minor / 100 | currency: tier.currency }}</strong> ·
+            Version {{ tier.price_version }}
+          </p>
+          <p class="muted">
+            Earlier price amounts remain in history. This new price applies to the current catalog;
+            future bookings will store their own price snapshot.
+          </p>
+          <form #priceForm="ngForm" (ngSubmit)="priceForm.valid && reviewPrice()">
+            <label for="new-price">New package price (USD)</label
+            ><input
+              id="new-price"
+              name="price"
+              type="text"
+              inputmode="decimal"
+              [(ngModel)]="priceInput"
+              (ngModelChange)="priceConfirmation.set(null)"
+              required
+              pattern="[0-9]{1,7}(\.[0-9]{1,2})?"
+              maxlength="10"
+              [disabled]="saving()"
+            /><small>Positive amount, up to two decimal places. Example: 42.50</small
+            ><button
+              class="primary"
+              type="submit"
+              [disabled]="!priceForm.valid || saving() || loading()"
+            >
+              Review price change
+            </button>
+          </form>
+          @if (priceConfirmation(); as amount) {
+            <div class="price-confirm" role="region" aria-label="Confirm price change">
+              <p>
+                Publish <strong>{{ amount / 100 | currency: tier.currency }}</strong> for
+                {{ tier.name }}, replacing {{ tier.amount_minor / 100 | currency: tier.currency }}?
+              </p>
+              <div class="actions">
+                <button type="button" class="primary" (click)="publish()" [disabled]="saving()">
+                  {{ saving() ? 'Publishing…' : 'Publish price' }}</button
+                ><button type="button" (click)="priceConfirmation.set(null)" [disabled]="saving()">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          }
+          <h4>Price history</h4>
+          @if (historyLoading()) {
+            <p role="status">Loading versions…</p>
+          }
+          @if (historyError()) {
+            <p role="alert">{{ historyError() }}</p>
+          }
+          <ol class="price-history">
+            @for (price of prices(); track price.id) {
+              <li>
+                <div>
+                  <strong>{{ price.amount_minor / 100 | currency: price.currency }}</strong
+                  ><span class="badge" [class.retired]="!price.active">{{
+                    price.active ? 'Current' : 'Previous'
+                  }}</span>
+                </div>
+                <small
+                  >Version {{ price.version }} · {{ price.created_at | date: 'medium' }} ·
+                  {{ price.created_by ? 'Administrator change' : 'Initial catalog' }}</small
+                >
+              </li>
+            }
+          </ol>
+        } @else {
+          <div class="empty-price">
+            <span aria-hidden="true">✦</span>
+            <h3>A price for every adventure.</h3>
+            <p>Select a ticket tier to update its price and view earlier versions.</p>
+          </div>
+        }
+      </section>
+    </div>
+    <p class="muted">
+      The assignment’s four package codes, guest limits and USD currency stay fixed in this step.
+      Individual: 1; Couple: 2; Family: up to 4; Group: up to 5.
+    </p>
+  }
+  @if (section() === 'activity') {
+    <div class="section-heading">
+      <div>
+        <h2>Recent activity</h2>
+        <p>The latest 30 successful administrator changes, recorded with the database update.</p>
+      </div>
+      <button type="button" (click)="load()" [disabled]="loading() || saving()">
+        Refresh activity
+      </button>
+    </div>
+    <ol class="activity">
+      @for (event of events(); track event.id) {
+        <li>
+          <strong>{{ event.action.replaceAll('_', ' ').toLowerCase() }}</strong
+          ><time>{{ event.created_at | date: 'medium' }}</time
+          ><small>Resource {{ event.resource_id }} · Actor {{ event.actor_id }}</small>
+        </li>
+      } @empty {
+        <li>No administrator changes recorded yet.</li>
+      }
+    </ol>
+  }
+</section>

@@ -1,0 +1,695 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Wonderland Step 05 encrypted SNS/SQS fanout, processing and delivery DLQs, scoped temporary worker roles. No public access.",
+  "Parameters": {
+    "DevelopmentPrincipalArn": {
+      "Type": "String",
+      "Description": "Existing principal allowed to assume scoped local worker roles; no keys created."
+    }
+  },
+  "Resources": {
+    "CatalogTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "TopicName": {
+          "Fn::Sub": "${AWS::StackName}-catalog"
+        },
+        "KmsMasterKeyId": "alias/aws/sns"
+      }
+    },
+    "BookingTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "TopicName": {
+          "Fn::Sub": "${AWS::StackName}-booking"
+        },
+        "KmsMasterKeyId": "alias/aws/sns"
+      }
+    },
+    "BookingPricesDLQ": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": {
+          "Fn::Sub": "${AWS::StackName}-booking-prices-dlq"
+        },
+        "SqsManagedSseEnabled": true,
+        "MessageRetentionPeriod": 1209600,
+        "RedriveAllowPolicy": {
+          "redrivePermission": "byQueue",
+          "sourceQueueArns": [
+            {
+              "Fn::Sub": "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}-booking-prices"
+            }
+          ]
+        }
+      }
+    },
+    "BookingPrices": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": {
+          "Fn::Sub": "${AWS::StackName}-booking-prices"
+        },
+        "SqsManagedSseEnabled": true,
+        "MessageRetentionPeriod": 1209600,
+        "ReceiveMessageWaitTimeSeconds": 20,
+        "VisibilityTimeout": 60,
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "BookingPricesDLQ",
+              "Arn"
+            ]
+          },
+          "maxReceiveCount": 5
+        }
+      }
+    },
+    "PaymentBookingsDLQ": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": {
+          "Fn::Sub": "${AWS::StackName}-payment-bookings-dlq"
+        },
+        "SqsManagedSseEnabled": true,
+        "MessageRetentionPeriod": 1209600,
+        "RedriveAllowPolicy": {
+          "redrivePermission": "byQueue",
+          "sourceQueueArns": [
+            {
+              "Fn::Sub": "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}-payment-bookings"
+            }
+          ]
+        }
+      }
+    },
+    "PaymentBookings": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": {
+          "Fn::Sub": "${AWS::StackName}-payment-bookings"
+        },
+        "SqsManagedSseEnabled": true,
+        "MessageRetentionPeriod": 1209600,
+        "ReceiveMessageWaitTimeSeconds": 20,
+        "VisibilityTimeout": 60,
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "PaymentBookingsDLQ",
+              "Arn"
+            ]
+          },
+          "maxReceiveCount": 5
+        }
+      }
+    },
+    "AnalyticsBookingsDLQ": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": {
+          "Fn::Sub": "${AWS::StackName}-analytics-bookings-dlq"
+        },
+        "SqsManagedSseEnabled": true,
+        "MessageRetentionPeriod": 1209600,
+        "RedriveAllowPolicy": {
+          "redrivePermission": "byQueue",
+          "sourceQueueArns": [
+            {
+              "Fn::Sub": "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}-analytics-bookings"
+            }
+          ]
+        }
+      }
+    },
+    "AnalyticsBookings": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": {
+          "Fn::Sub": "${AWS::StackName}-analytics-bookings"
+        },
+        "SqsManagedSseEnabled": true,
+        "MessageRetentionPeriod": 1209600,
+        "ReceiveMessageWaitTimeSeconds": 20,
+        "VisibilityTimeout": 60,
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "AnalyticsBookingsDLQ",
+              "Arn"
+            ]
+          },
+          "maxReceiveCount": 5
+        }
+      }
+    },
+    "DeliveryDLQ": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": {
+          "Fn::Sub": "${AWS::StackName}-delivery-dlq"
+        },
+        "SqsManagedSseEnabled": true,
+        "MessageRetentionPeriod": 1209600
+      }
+    },
+    "BookingPricesPolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "BookingPrices"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Action": "sqs:SendMessage",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "BookingPrices",
+                  "Arn"
+                ]
+              },
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": [
+                    {
+                      "Ref": "CatalogTopic"
+                    }
+                  ]
+                },
+                "StringEquals": {
+                  "aws:SourceAccount": {
+                    "Ref": "AWS::AccountId"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "PaymentBookingsPolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "PaymentBookings"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Action": "sqs:SendMessage",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "PaymentBookings",
+                  "Arn"
+                ]
+              },
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": [
+                    {
+                      "Ref": "BookingTopic"
+                    }
+                  ]
+                },
+                "StringEquals": {
+                  "aws:SourceAccount": {
+                    "Ref": "AWS::AccountId"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "AnalyticsBookingsPolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "AnalyticsBookings"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Action": "sqs:SendMessage",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "AnalyticsBookings",
+                  "Arn"
+                ]
+              },
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": [
+                    {
+                      "Ref": "BookingTopic"
+                    }
+                  ]
+                },
+                "StringEquals": {
+                  "aws:SourceAccount": {
+                    "Ref": "AWS::AccountId"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "DeliveryDLQPolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "DeliveryDLQ"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Action": "sqs:SendMessage",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "DeliveryDLQ",
+                  "Arn"
+                ]
+              },
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": [
+                    {
+                      "Ref": "CatalogTopic"
+                    },
+                    {
+                      "Ref": "BookingTopic"
+                    }
+                  ]
+                },
+                "StringEquals": {
+                  "aws:SourceAccount": {
+                    "Ref": "AWS::AccountId"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "BookingPricesSubscription": {
+      "Type": "AWS::SNS::Subscription",
+      "DependsOn": [
+        "BookingPricesPolicy",
+        "DeliveryDLQPolicy"
+      ],
+      "Properties": {
+        "TopicArn": {
+          "Ref": "CatalogTopic"
+        },
+        "Protocol": "sqs",
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "BookingPrices",
+            "Arn"
+          ]
+        },
+        "RawMessageDelivery": true,
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "DeliveryDLQ",
+              "Arn"
+            ]
+          }
+        }
+      }
+    },
+    "PaymentBookingsSubscription": {
+      "Type": "AWS::SNS::Subscription",
+      "DependsOn": [
+        "PaymentBookingsPolicy",
+        "DeliveryDLQPolicy"
+      ],
+      "Properties": {
+        "TopicArn": {
+          "Ref": "BookingTopic"
+        },
+        "Protocol": "sqs",
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "PaymentBookings",
+            "Arn"
+          ]
+        },
+        "RawMessageDelivery": true,
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "DeliveryDLQ",
+              "Arn"
+            ]
+          }
+        }
+      }
+    },
+    "AnalyticsBookingsSubscription": {
+      "Type": "AWS::SNS::Subscription",
+      "DependsOn": [
+        "AnalyticsBookingsPolicy",
+        "DeliveryDLQPolicy"
+      ],
+      "Properties": {
+        "TopicArn": {
+          "Ref": "BookingTopic"
+        },
+        "Protocol": "sqs",
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "AnalyticsBookings",
+            "Arn"
+          ]
+        },
+        "RawMessageDelivery": true,
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "DeliveryDLQ",
+              "Arn"
+            ]
+          }
+        }
+      }
+    },
+    "CatalogPublisherRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Ref": "DevelopmentPrincipalArn"
+                }
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "RuntimeOnly",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Publish"
+                  ],
+                  "Resource": {
+                    "Ref": "CatalogTopic"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "kms:GenerateDataKey",
+                    "kms:Decrypt"
+                  ],
+                  "Resource": "*",
+                  "Condition": {
+                    "StringEquals": {
+                      "kms:ViaService": {
+                        "Fn::Sub": "sns.${AWS::Region}.${AWS::URLSuffix}"
+                      },
+                      "kms:CallerAccount": {
+                        "Ref": "AWS::AccountId"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "BookingPublisherRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Ref": "DevelopmentPrincipalArn"
+                }
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "RuntimeOnly",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Publish"
+                  ],
+                  "Resource": {
+                    "Ref": "BookingTopic"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "kms:GenerateDataKey",
+                    "kms:Decrypt"
+                  ],
+                  "Resource": "*",
+                  "Condition": {
+                    "StringEquals": {
+                      "kms:ViaService": {
+                        "Fn::Sub": "sns.${AWS::Region}.${AWS::URLSuffix}"
+                      },
+                      "kms:CallerAccount": {
+                        "Ref": "AWS::AccountId"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "BookingConsumerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Ref": "DevelopmentPrincipalArn"
+                }
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "RuntimeOnly",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:GetQueueAttributes"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "BookingPrices",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AnalyticsConsumerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Ref": "DevelopmentPrincipalArn"
+                }
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "RuntimeOnly",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:GetQueueAttributes"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "AnalyticsBookings",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "CatalogTopicArn": {
+      "Value": {
+        "Ref": "CatalogTopic"
+      }
+    },
+    "BookingTopicArn": {
+      "Value": {
+        "Ref": "BookingTopic"
+      }
+    },
+    "DeliveryDLQUrl": {
+      "Value": {
+        "Ref": "DeliveryDLQ"
+      }
+    },
+    "BookingPricesUrl": {
+      "Value": {
+        "Ref": "BookingPrices"
+      }
+    },
+    "BookingPricesDLQUrl": {
+      "Value": {
+        "Ref": "BookingPricesDLQ"
+      }
+    },
+    "PaymentBookingsUrl": {
+      "Value": {
+        "Ref": "PaymentBookings"
+      }
+    },
+    "PaymentBookingsDLQUrl": {
+      "Value": {
+        "Ref": "PaymentBookingsDLQ"
+      }
+    },
+    "AnalyticsBookingsUrl": {
+      "Value": {
+        "Ref": "AnalyticsBookings"
+      }
+    },
+    "AnalyticsBookingsDLQUrl": {
+      "Value": {
+        "Ref": "AnalyticsBookingsDLQ"
+      }
+    },
+    "CatalogPublisherRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "CatalogPublisherRole",
+          "Arn"
+        ]
+      }
+    },
+    "BookingPublisherRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "BookingPublisherRole",
+          "Arn"
+        ]
+      }
+    },
+    "BookingConsumerRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "BookingConsumerRole",
+          "Arn"
+        ]
+      }
+    },
+    "AnalyticsConsumerRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "AnalyticsConsumerRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

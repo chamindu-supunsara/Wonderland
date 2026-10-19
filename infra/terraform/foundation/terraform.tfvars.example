@@ -1,0 +1,4 @@
+# Copy to ignored terraform.tfvars and replace both values. No passwords belong here.
+operator_arn  = "arn:aws:iam::708919751353:role/REPLACE_WITH_PERMANENT_IDENTITY_CENTER_ROLE_PATH"
+operator_cidr = "203.0.113.10/32"
+node_count   = 2

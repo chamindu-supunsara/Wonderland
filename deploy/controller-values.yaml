@@ -1,0 +1,15 @@
+clusterName: wonderland-demo
+region: ap-south-1
+vpcId: vpc-00967ab06f35249ff
+replicaCount: 2
+watchNamespace: wonderland
+serviceAccount:
+  create: true
+  name: aws-load-balancer-controller
+enableServiceMutatorWebhook: false
+enableBackendSecurityGroup: false
+enableManageBackendSecurityGroupRules: false
+keepTLSSecret: true
+resources:
+  requests: {cpu: 100m, memory: 128Mi}
+  limits: {cpu: 500m, memory: 384Mi}

@@ -1,0 +1,90 @@
+<section class="booking-shell">
+  <span class="eyebrow">YOUR WONDERLAND VISITS</span>
+  <h1>{{ id ? 'Your reservation' : 'My bookings' }} <span>✦</span></h1>
+  <p>Reservations belong to your signed-in account. All times are Asia/Colombo (UTC+05:30).</p>
+  <nav>
+    <a routerLink="/book">Plan a visit →</a><a routerLink="/account">My account</a
+    ><a routerLink="/visits">My visit history</a>
+    @if (id) {
+      <a routerLink="/bookings">All my bookings</a>
+    }
+  </nav>
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+  }
+  <button type="button" (click)="load()" [disabled]="loading() || busy()">
+    Refresh booking status
+  </button>
+  @if (loading()) {
+    <p role="status">Loading your bookings…</p>
+  } @else {
+    <div class="history-list">
+      @for (booking of rows(); track booking.id) {
+        <article class="panel">
+          <span class="badge">{{
+            booking.status === 'PENDING_PAYMENT'
+              ? 'Pending payment'
+              : booking.status === 'CANCELLED'
+                ? 'Cancelled'
+                : booking.status === 'CONFIRMED'
+                  ? 'Confirmed · MOCK'
+                  : booking.status === 'PAYMENT_FAILED'
+                    ? 'Mock payment failed'
+                    : 'Expired'
+          }}</span>
+          <h2>{{ booking.tier_name }} · {{ booking.guest_count }} guest(s)</h2>
+          <p class="reference">{{ booking.reference }}</p>
+          <p>
+            {{ booking.starts_at | date: 'MMM d, y, h:mm a' : '+0530' }} –
+            {{ booking.ends_at | date: 'h:mm a' : '+0530' }}
+          </p>
+          <p>
+            {{ booking.amount_minor / 100 | currency: booking.currency }} per package · Price
+            version {{ booking.price_version }}
+          </p>
+          <small>Reserved {{ booking.created_at | date: 'MMM d, y, h:mm a' : '+0530' }}</small>
+          @if (booking.status === 'PENDING_PAYMENT') {
+            <p>
+              Hold ends {{ booking.expires_at | date: 'MMM d, h:mm a' : '+0530' }}. Mock checkout
+              can confirm a demonstration visit. No real charge is made.
+            </p>
+            <a [routerLink]="['/checkout', booking.id]">Open mock checkout →</a>
+            @if (confirm() === booking.id) {
+              <div class="notice" role="region" aria-label="Confirm cancellation">
+                <p>
+                  Cancel this unpaid reservation and release {{ booking.guest_count }} guest
+                  place(s)?
+                </p>
+                <button (click)="cancel(booking.id)" [disabled]="busy()">
+                  Confirm cancellation</button
+                ><button (click)="confirm.set(null)" [disabled]="busy()">Keep reservation</button>
+              </div>
+            } @else {
+              <button (click)="confirm.set(booking.id)" [disabled]="busy()">
+                Cancel unpaid reservation
+              </button>
+            }
+          }
+          @if (booking.status === 'CONFIRMED') {
+            <a [routerLink]="['/bookings', booking.id, 'tickets']">View demonstration tickets →</a>
+          }
+          @if (!id) {
+            <a [routerLink]="['/bookings', booking.id]">View details ↗</a>
+          }
+        </article>
+      } @empty {
+        <article class="panel">
+          <h2>No bookings here yet.</h2>
+          <p>Plan your first park day or return to the previous history page.</p>
+        </article>
+      }
+    </div>
+    @if (!id) {
+      <nav>
+        <button (click)="page(-1)" [disabled]="offset === 0 || busy()">Previous</button
+        ><span>Page {{ offset / 20 + 1 }}</span
+        ><button (click)="page(1)" [disabled]="rows().length < 20 || busy()">Next</button>
+      </nav>
+    }
+  }
+</section>

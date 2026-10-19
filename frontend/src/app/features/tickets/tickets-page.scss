@@ -1,0 +1,106 @@
+.ticket-intro {
+  text-align: center;
+  padding: 3.2rem 1rem;
+}
+.ticket-intro h1 {
+  font-size: clamp(3rem, 6vw, 5rem);
+  letter-spacing: -0.07em;
+  line-height: 1.05;
+  margin: 1rem 0 1.5rem;
+}
+.ticket-intro > p {
+  max-width: 430px;
+  margin: auto;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+.tier-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1.8rem 1.4rem;
+}
+.tier-card.family {
+  background: #e8eddf;
+  border-color: #a2b293;
+}
+.tier-card h2 {
+  font-size: 1.65rem;
+  letter-spacing: -0.05em;
+  margin: 0.9rem 0 1.7rem;
+}
+.tier-card .eyebrow {
+  font-size: 0.6rem;
+}
+.price {
+  font-size: 2.9rem;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  margin: 0 0 2rem;
+}
+.price span {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-top: 0.4rem;
+}
+ul {
+  padding-left: 1rem;
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 2.3;
+  color: #4c6254;
+}
+.price-note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 1.5rem;
+}
+.booking-notice {
+  margin-top: 3rem;
+  display: flex;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: #f4ecd6;
+  border-radius: 16px;
+}
+.booking-notice > span {
+  font-size: 3rem;
+  color: var(--pink);
+}
+.booking-notice h2 {
+  margin: 0 0 0.7rem;
+  font-size: 1.3rem;
+}
+.booking-notice p {
+  max-width: 630px;
+  color: #596853;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  margin: 0;
+}
+@media (max-width: 1000px) {
+  .tier-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 540px) {
+  .tier-grid {
+    grid-template-columns: 1fr;
+  }
+  .ticket-intro {
+    padding-top: 2rem;
+  }
+  .booking-notice {
+    padding: 1.4rem;
+    gap: 1rem;
+  }
+}

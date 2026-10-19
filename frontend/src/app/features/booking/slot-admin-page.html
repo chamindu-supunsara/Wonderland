@@ -1,0 +1,64 @@
+<section class="booking-shell">
+  <span class="eyebrow">WONDERLAND · ADMINISTRATOR</span>
+  <h1>Room for adventure <span>✦</span></h1>
+  <p>
+    Add visit windows and guest capacity. Times use Asia/Colombo. Overlapping slots are rejected.
+  </p>
+  <nav>
+    <a routerLink="/admin">Attractions and pricing</a><a routerLink="/book">Visitor booking form</a>
+  </nav>
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+  }
+  @if (notice()) {
+    <p class="notice success" role="status">{{ notice() }}</p>
+  }
+  <div class="booking-grid">
+    <form class="panel" (ngSubmit)="save()" #form="ngForm">
+      <fieldset [disabled]="busy() || !policy()">
+        <label for="date">Visit date</label
+        ><input
+          id="date"
+          name="date"
+          type="date"
+          required
+          [min]="policy()?.today"
+          [max]="policy()?.last_date"
+          [(ngModel)]="date"
+          (ngModelChange)="load()"
+        />
+        <label for="start">Start time</label
+        ><input id="start" name="start" type="time" required [(ngModel)]="start" />
+        <label for="end">End time</label
+        ><input id="end" name="end" type="time" required [(ngModel)]="end" />
+        <label for="capacity">Guest capacity</label
+        ><input
+          id="capacity"
+          name="capacity"
+          type="number"
+          min="1"
+          max="10000"
+          step="1"
+          required
+          [(ngModel)]="capacity"
+        />
+        <button class="primary" type="submit" [disabled]="form.invalid">
+          {{ busy() ? 'Adding…' : 'Add time slot' }}
+        </button>
+      </fieldset>
+    </form>
+    <aside class="panel">
+      <h2>Slots on this date</h2>
+      <button (click)="load()" [disabled]="busy()">Refresh availability</button>
+      @for (slot of slots(); track slot.id) {
+        <p>
+          {{ slot.starts_at | date: 'h:mm a' : '+0530' }} –
+          {{ slot.ends_at | date: 'h:mm a' : '+0530' }}<br />{{ slot.remaining_guests }} /
+          {{ slot.capacity_guests }} guest places available · {{ slot.held_guests }} held
+        </p>
+      } @empty {
+        <p>No future slots on this date.</p>
+      }
+    </aside>
+  </div>
+</section>

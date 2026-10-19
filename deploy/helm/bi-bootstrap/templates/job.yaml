@@ -1,0 +1,60 @@
+{{- if ne .Release.Namespace "wonderland-bootstrap" }}{{ fail "Use the dedicated bootstrap namespace" }}{{ end }}
+{{- if not (regexMatch "^708919751353[.]dkr[.]ecr[.]ap-south-1[.]amazonaws[.]com/wonderland-demo/analytics@sha256:[a-f0-9]{64}$" .Values.image) }}{{ fail "Pin reviewed bootstrap image in analytics repository" }}{{ end }}
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: bi-bootstrap}
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: bi-bootstrap-secret-writer, namespace: wonderland}
+rules:
+  - apiGroups: ['']
+    resources: [secrets]
+    resourceNames: [wonderland-metabase-app]
+    verbs: [get, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: bi-bootstrap-secret-writer, namespace: wonderland}
+subjects: [{kind: ServiceAccount, name: bi-bootstrap, namespace: wonderland-bootstrap}]
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: bi-bootstrap-secret-writer}
+---
+apiVersion: batch/v1
+kind: Job
+metadata: {name: wonderland-bi-bootstrap}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 900
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata: {labels: {app: wonderland-bi-bootstrap}}
+    spec:
+      serviceAccountName: bi-bootstrap
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: bootstrap
+          image: {{ .Values.image | quote }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          env:
+            - {name: AWS_REGION, value: ap-south-1}
+            - {name: AWS_DEFAULT_REGION, value: ap-south-1}
+            - {name: AWS_EC2_METADATA_DISABLED, value: 'true'}
+            - {name: DATABASE_HOST, value: {{ required "DB host required" .Values.databaseHost | quote }}}
+            - {name: MASTER_SECRET_ARN, value: {{ required "Master ARN required" .Values.masterSecretArn | quote }}}
+            - {name: APP_SECRET_ARN, value: {{ required "App ARN required" .Values.appSecretArn | quote }}}
+            - {name: REPORTING_SECRET_ARN, value: {{ required "Reporting ARN required" .Values.reportingSecretArn | quote }}}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {medium: Memory, sizeLimit: 64Mi}}]

@@ -1,0 +1,83 @@
+{{- if ne .Release.Namespace "wonderland" }}{{ fail "Use wonderland namespace" }}{{ end }}
+{{- if not (regexMatch "^metabase/metabase@sha256:[a-f0-9]{64}$" .Values.image) }}{{ fail "Pin the official Metabase image by digest" }}{{ end }}
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: wonderland-metabase}
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: wonderland-metabase}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  revisionHistoryLimit: 2
+  progressDeadlineSeconds: 1200
+  selector: {matchLabels: {app: wonderland-metabase}}
+  template:
+    metadata: {labels: {app: wonderland-metabase, component: private-bi}}
+    spec:
+      serviceAccountName: wonderland-metabase
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: metabase
+          image: {{ .Values.image | quote }}
+          ports: [{name: http, containerPort: 3000}]
+          envFrom: [{secretRef: {name: wonderland-metabase-app}}]
+          env:
+            - {name: MB_DB_TYPE, value: postgres}
+            - {name: MB_SITE_NAME, value: "Wonderland CLOUD MOCK Analytics"}
+            - {name: MB_SITE_URL, value: {{ .Values.siteUrl | quote }}}
+            - {name: MB_ANON_TRACKING_ENABLED, value: 'false'}
+            - {name: MB_ENABLE_PUBLIC_SHARING, value: 'false'}
+            - {name: MB_ENABLE_EMBEDDING, value: 'false'}
+            - {name: MB_REPORT_TIMEZONE, value: Asia/Colombo}
+            - {name: JAVA_TIMEZONE, value: Asia/Colombo}
+            - {name: MB_PLUGINS_DIR, value: /plugins}
+            - {name: MB_APPLICATION_DB_MAX_CONNECTION_POOL_SIZE, value: '10'}
+            - {name: JAVA_OPTS, value: "-Xms256m -Xmx768m -XX:ReservedCodeCacheSize=128m -XX:MaxDirectMemorySize=128m -XX:ActiveProcessorCount=2 -Djava.io.tmpdir=/tmp"}
+          resources:
+            requests: {cpu: 250m, memory: 1536Mi, ephemeral-storage: 1Gi}
+            limits: {cpu: '1', memory: 2Gi, ephemeral-storage: 2Gi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          startupProbe:
+            httpGet: {path: /api/health, port: http}
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 80
+          readinessProbe:
+            httpGet: {path: /api/health, port: http}
+            periodSeconds: 15
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet: {path: /api/health, port: http}
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          volumeMounts:
+            - {name: ca, mountPath: /certs, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+            - {name: plugins, mountPath: /plugins}
+      volumes:
+        - name: ca
+          configMap: {name: wonderland-rds-ca}
+        - {name: tmp, emptyDir: {sizeLimit: 256Mi}}
+        - {name: plugins, emptyDir: {sizeLimit: 1Gi}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: wonderland-metabase}
+spec:
+  type: ClusterIP
+  selector: {app: wonderland-metabase}
+  ports: [{name: http, port: 3000, targetPort: http}]

@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wonderland
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wonderland-bootstrap
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+---
+apiVersion: v1
+kind: Secret
+metadata: {name: wonderland-catalog, namespace: wonderland}
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata: {name: wonderland-booking, namespace: wonderland}
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata: {name: wonderland-payment, namespace: wonderland}
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata: {name: wonderland-admission, namespace: wonderland}
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata: {name: wonderland-analytics, namespace: wonderland}
+type: Opaque

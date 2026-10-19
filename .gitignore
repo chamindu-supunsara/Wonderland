@@ -1,0 +1,44 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+!deploy/certs/rds-global-bundle.pem
+*.key
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform.tfvars
+*.tfvars
+*.tfvars.json
+.terraform.tfstate.lock.info
+infra/terraform/bootstrap/backend.tf
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Angular / Node
+node_modules/
+.angular/
+dist/
+coverage/
+
+# Tools and generated artifacts
+.terraform/
+tmp/
+.local/
+*.log
+# Raw owner-console, ticket and billing evidence stays local.
+docs/evidence/
+.DS_Store
+Thumbs.db
+.idea/
+

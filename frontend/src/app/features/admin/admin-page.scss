@@ -1,0 +1,379 @@
+:host {
+  display: block;
+}
+.admin-shell {
+  max-width: 1240px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+.admin-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+h1 {
+  font-size: clamp(2.2rem, 4.5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+  font-weight: 600;
+  margin: 1rem 0;
+}
+h1 span {
+  color: var(--pink);
+  margin-left: 0.4rem;
+}
+h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.8rem;
+  letter-spacing: -0.04em;
+}
+h3 {
+  margin: 0.6rem 0 1rem;
+  font-size: 1.4rem;
+}
+p {
+  line-height: 1.65;
+}
+.admin-heading p,
+.section-heading p,
+.muted {
+  color: var(--muted);
+}
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  gap: 1rem;
+}
+.summary span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.summary strong {
+  display: block;
+  font-size: 2rem;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+button,
+.quiet-button {
+  border: 1px solid #b7c1b6;
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--ink);
+  padding: 0.7rem 1.2rem;
+  font: inherit;
+  font-size: 0.86rem;
+  text-decoration: none;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.primary {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+.danger {
+  background: #883c45;
+  color: white;
+  border-color: #883c45;
+}
+.admin-tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin: 2rem 0;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.admin-tabs button {
+  border-color: transparent;
+}
+.admin-tabs .selected {
+  background: var(--yellow);
+}
+.section-heading {
+  align-items: center;
+  margin: 2rem 0 1.5rem;
+}
+.section-heading p {
+  margin: 0;
+  max-width: 38rem;
+}
+.section-heading button {
+  flex-shrink: 0;
+}
+.editor,
+.price-editor {
+  padding: 2rem;
+  border: 1px solid var(--line);
+  background: #fffefa;
+  border-radius: 1.2rem;
+  margin-bottom: 2rem;
+}
+.editor {
+  box-shadow: 0 12px 40px #17382e09;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+.wide {
+  grid-column: 1 / -1;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 650;
+  margin-bottom: 0.55rem;
+}
+input,
+textarea,
+select {
+  font: inherit;
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #b7c1b6;
+  border-radius: 0.6rem;
+  color: var(--ink);
+  background: white;
+}
+textarea {
+  resize: vertical;
+}
+small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin-top: 0.4rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+}
+.editor .actions {
+  margin-top: 1.5rem;
+}
+.filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.attraction-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+.ride-card {
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  overflow-wrap: anywhere;
+  background: #fffefa;
+}
+.ride-top {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-content: space-between;
+}
+.category {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.badge {
+  display: inline-block;
+  padding: 0.3rem 0.65rem;
+  border-radius: 1rem;
+  background: #dce9d5;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+.badge.retired {
+  background: #e9e7e0;
+  color: #64675c;
+}
+.ride-card p {
+  font-size: 0.9rem;
+}
+.ride-card dl {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.8rem;
+}
+.ride-card dt {
+  color: var(--muted);
+}
+.ride-card dd {
+  margin: 0.4rem 0;
+}
+.guidance {
+  border-left: 3px solid var(--yellow);
+  padding-left: 0.8rem;
+}
+.ride-card footer {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+.ride-card footer .actions {
+  margin-top: 1rem;
+}
+.retire-link {
+  color: #883c45;
+}
+.notice {
+  padding: 1rem 1.3rem;
+  border-radius: 0.8rem;
+}
+.notice p {
+  margin-top: 0;
+}
+.notice a {
+  margin-left: 1rem;
+}
+.success {
+  background: #e0ecda;
+}
+.error,
+.retire-confirm {
+  background: #f5e6e7;
+}
+.retire-confirm {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  margin: 1rem 0 2rem;
+}
+.pricing-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 2rem;
+}
+.tier-list {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+.tier-card {
+  border-radius: 1rem;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  background: #fffefa;
+}
+.tier-card .eyebrow,
+.tier-card small {
+  grid-column: 1 / -1;
+}
+.tier-card strong {
+  font-size: 1.3rem;
+}
+.tier-card.chosen {
+  border: 2px solid var(--ink);
+  background: #edf0e6;
+}
+.price-editor {
+  margin: 0;
+}
+.price-editor form {
+  display: grid;
+  gap: 0.5rem;
+}
+.price-editor form .primary {
+  margin: 1rem 0;
+  justify-self: start;
+}
+.price-confirm {
+  background: #f6efd5;
+  padding: 1rem;
+  border-radius: 0.8rem;
+  margin: 1rem 0;
+}
+.price-history {
+  list-style: none;
+  padding: 0;
+}
+.price-history li {
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+}
+.price-history li div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.empty-price {
+  padding: 4rem 1rem;
+  text-align: center;
+}
+.empty-price > span {
+  font-size: 4rem;
+  color: var(--pink);
+}
+.activity {
+  list-style: none;
+  padding: 0;
+}
+.activity li {
+  border-bottom: 1px solid var(--line);
+  padding: 1.2rem 0;
+  overflow-wrap: anywhere;
+}
+.activity time {
+  display: block;
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .admin-shell {
+    padding: 0 1rem;
+  }
+  .admin-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+  .attraction-list,
+  .pricing-layout {
+    grid-template-columns: 1fr;
+  }
+  .editor,
+  .price-editor {
+    padding: 1.3rem;
+  }
+  .section-heading {
+    align-items: flex-start;
+  }
+  .form-grid,
+  .filters {
+    grid-template-columns: 1fr;
+  }
+  .summary {
+    padding: 1rem;
+  }
+  .summary span {
+    font-size: 0.75rem;
+  }
+  .summary strong {
+    font-size: 1.5rem;
+  }
+}

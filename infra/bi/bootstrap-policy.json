@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadOnlyExistingMaster",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:ap-south-1:708919751353:secret:rds!db-1428dad0-d388-45c0-bbd3-baef545c4318-EVaRUF"
+    },
+    {
+      "Sid": "OnlyTwoBICredentials",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:PutSecretValue"
+      ],
+      "Resource": [
+        "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/metabase-app-??????",
+        "arn:aws:secretsmanager:ap-south-1:708919751353:secret:wonderland-demo/metabase-reporting-??????"
+      ]
+    }
+  ]
+}

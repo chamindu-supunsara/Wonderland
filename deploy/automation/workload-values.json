@@ -1,0 +1,54 @@
+{
+  "enabled": true,
+  "workers": {
+    "admission-publisher": {
+      "env": {
+        "EVENTS_TOPIC_ARN": "arn:aws:sns:ap-south-1:708919751353:wonderland-demo-admission"
+      },
+      "enabled": true
+    },
+    "catalog-publisher": {
+      "env": {
+        "EVENTS_TOPIC_ARN": "arn:aws:sns:ap-south-1:708919751353:wonderland-demo-catalog"
+      },
+      "enabled": true
+    },
+    "booking-maintenance": {
+      "enabled": true
+    },
+    "analytics-bookings": {
+      "env": {
+        "BOOKING_QUEUE_URL": "https://sqs.ap-south-1.amazonaws.com/708919751353/wonderland-demo-analytics-bookings"
+      },
+      "enabled": true
+    },
+    "analytics-admissions": {
+      "env": {
+        "ADMISSION_QUEUE_URL": "https://sqs.ap-south-1.amazonaws.com/708919751353/wonderland-demo-analytics-admissions"
+      },
+      "enabled": true
+    },
+    "booking-prices": {
+      "env": {
+        "PRICING_QUEUE_URL": "https://sqs.ap-south-1.amazonaws.com/708919751353/wonderland-demo-booking-prices"
+      },
+      "enabled": true
+    },
+    "booking-publisher": {
+      "env": {
+        "EVENTS_TOPIC_ARN": "arn:aws:sns:ap-south-1:708919751353:wonderland-demo-booking"
+      },
+      "enabled": true
+    }
+  },
+  "images": {
+    "admission": "708919751353.dkr.ecr.ap-south-1.amazonaws.com/wonderland-demo/admission@sha256:7a79bf076a642d9d30b6d790a496f375f8fa41e1f0e4c759da14beb6fa5a8e94",
+    "analytics": "708919751353.dkr.ecr.ap-south-1.amazonaws.com/wonderland-demo/analytics@sha256:842ed8fa2aff786416a8deb34ae8352d869d0821d1e5e4ce00294afde27edbff",
+    "payment": "708919751353.dkr.ecr.ap-south-1.amazonaws.com/wonderland-demo/payment@sha256:5fae0c3b51edec41bdcdd986ab26bd824bf246da775356c5f7662f21862e8843",
+    "catalog": "708919751353.dkr.ecr.ap-south-1.amazonaws.com/wonderland-demo/catalog@sha256:91385323f59220da4a971441b1c43f9ddcd675e2f6c52cdb9067ddce13b458fb",
+    "booking": "708919751353.dkr.ecr.ap-south-1.amazonaws.com/wonderland-demo/booking@sha256:599f13e7a8a6edc72ff9b30e47d72b261d80a782a8ed535c520da2a4aaddd42b"
+  },
+  "frontendOrigin": "https://main.d3vt08cs3xnlse.amplifyapp.com",
+  "pricingMode": "projection",
+  "apiReplicas": 2
+}

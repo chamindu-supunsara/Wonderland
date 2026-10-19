@@ -1,0 +1,14 @@
+[tool.pytest.ini_options]
+testpaths = ["services/catalog/tests", "services/booking/tests", "services/payment/tests", "services/admission/tests", "tests"]
+pythonpath = ["services/catalog", "services/booking", "services/analytics", "services/payment", "services/admission", "packages/common"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["services/catalog", "services/booking"]
+exclude = ["tmp", ".venv", "frontend", "services/catalog/alembic/versions", "services/booking/alembic/versions", "services/analytics/alembic/versions", "services/payment/alembic/versions", "services/admission/alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+

@@ -1,0 +1,22 @@
+{{- if .Values.enabled }}
+{{- if gt (len .Release.Name) 30 }}{{ fail "Release name must be at most 30 characters" }}{{ end }}
+{{- if and .Values.frontendOrigin (not (regexMatch "^https://[A-Za-z0-9.-]+(:443)?$" .Values.frontendOrigin)) }}{{ fail "frontendOrigin must be empty for private rollout or the exact HTTPS Angular origin without a path or trailing slash" }}{{ end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-runtime
+data:
+  AWS_REGION: {{ .Values.cognito.region | quote }}
+  AWS_DEFAULT_REGION: {{ .Values.cognito.region | quote }}
+  COGNITO_REGION: {{ .Values.cognito.region | quote }}
+  COGNITO_USER_POOL_ID: {{ .Values.cognito.userPoolId | quote }}
+  COGNITO_APP_CLIENT_ID: {{ .Values.cognito.userPoolClientId | quote }}
+  CORS_ORIGINS: {{ ternary (list .Values.frontendOrigin) (list) (ne .Values.frontendOrigin "") | toJson | quote }}
+  CATALOG_URL: {{ printf "http://%s-catalog:8000" .Release.Name | quote }}
+  BOOKING_URL: {{ printf "http://%s-booking:8000" .Release.Name | quote }}
+  MOCK_PAYMENTS_ENABLED: "true"
+  MOCK_ADMISSION_ENABLED: "true"
+  MOCK_ANALYTICS_ENABLED: "true"
+  PRICING_MODE: {{ .Values.pricingMode | quote }}
+  AWS_EC2_METADATA_DISABLED: "true"
+{{- end }}

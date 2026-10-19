@@ -1,0 +1,5 @@
+image: ""
+databaseHost: ""
+masterSecretArn: ""
+appSecretArn: ""
+reportingSecretArn: ""

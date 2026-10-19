@@ -1,0 +1,9 @@
+{{- if .Values.enabled }}
+Internal Python workloads rendered. This chart does not create the database, secrets,
+migrations, AWS workload permissions, ingress, API Gateway, Amplify or Metabase.
+Verify those prerequisites before installation. Checkout and admission remain MOCK.
+{{- else }}
+Deployment is disabled. This is the safe default for local lint and review.
+Supply real image digests, the HTTPS frontend origin and precreated workload secrets
+only after completing the Step 10 prerequisites.
+{{- end }}

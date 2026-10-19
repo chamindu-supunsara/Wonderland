@@ -1,0 +1,142 @@
+:host {
+  display: block;
+}
+.booking-shell {
+  max-width: 1150px;
+  margin: 3rem auto;
+  padding: 0 2rem;
+  min-height: 60vh;
+}
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+  font-weight: 600;
+}
+h1 span {
+  color: var(--pink);
+}
+h2 {
+  letter-spacing: -0.03em;
+}
+p {
+  line-height: 1.7;
+}
+nav {
+  display: flex;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 2rem 0;
+}
+.booking-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+.panel {
+  background: #fffefa;
+  border: 1px solid var(--line);
+  padding: 2rem;
+  border-radius: 1.2rem;
+  overflow-wrap: anywhere;
+}
+.summary {
+  align-self: start;
+}
+.price {
+  display: block;
+  font-size: 2.5rem;
+  margin: 1rem 0;
+}
+label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 1.4rem 0 0.6rem;
+}
+input,
+select {
+  width: 100%;
+  padding: 0.85rem;
+  border: 1px solid #b7c1b6;
+  border-radius: 0.6rem;
+  font: inherit;
+  background: white;
+  color: var(--ink);
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 0.6rem;
+}
+button {
+  font: inherit;
+  border: 1px solid #b7c1b6;
+  border-radius: 2rem;
+  padding: 0.8rem 1.2rem;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  margin: 1rem 0.5rem 0.5rem 0;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.primary {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+.notice {
+  padding: 1rem 1.4rem;
+  border-radius: 0.8rem;
+  background: #f6efd5;
+  margin: 1rem 0;
+}
+.error {
+  background: #f5e6e7;
+}
+.success {
+  background: #e0ecda;
+}
+.history-list {
+  display: grid;
+  gap: 1.4rem;
+  margin: 2rem 0;
+}
+.reference {
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.badge {
+  background: var(--yellow);
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+}
+.panel > a {
+  display: inline-block;
+  margin: 1rem 1rem 0 0;
+}
+@media (max-width: 760px) {
+  .booking-shell {
+    padding: 0 1rem;
+    margin: 2rem auto;
+  }
+  .booking-grid {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 1.3rem;
+  }
+}

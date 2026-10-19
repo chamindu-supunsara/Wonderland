@@ -1,0 +1,35 @@
+<section class="booking-shell">
+  <span class="eyebrow">YOUR WONDERLAND DEMONSTRATION</span>
+  <h1>Guest tickets <span>✦</span></h1>
+  <p class="notice">
+    MOCK — Demonstration only. Not valid for park admission. No payment was collected.
+  </p>
+  <nav>
+    <a routerLink="/bookings">My bookings</a
+    ><button (click)="print()" [disabled]="!tickets().length">
+      Print / save demonstration tickets
+    </button>
+  </nav>
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+    <button (click)="load()" [disabled]="loading()">Retry loading</button>
+  }
+  @if (loading()) {
+    <p role="status">Loading tickets…</p>
+  }
+  @if (booking(); as row) {
+    @for (ticket of tickets(); track ticket.id) {
+      <article class="panel demo-ticket">
+        <span class="badge">MOCK · GUEST {{ ticket.guest_number }} OF {{ row.guest_count }}</span>
+        <h2>{{ row.tier_name }} · Wonderland</h2>
+        <p>
+          {{ row.starts_at | date: 'MMM d, y, h:mm a' : '+0530' }} –
+          {{ row.ends_at | date: 'h:mm a' : '+0530' }} · Asia/Colombo
+        </p>
+        <p>Booking {{ row.reference }}</p>
+        <p class="reference">{{ ticket.reference }}</p>
+        <strong>DEMONSTRATION ONLY — NOT VALID FOR ADMISSION</strong>
+      </article>
+    }
+  }
+</section>

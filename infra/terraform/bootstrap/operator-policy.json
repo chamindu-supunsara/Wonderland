@@ -1,0 +1,26 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ManageOnlyWonderlandStateBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket", "s3:PutBucketVersioning", "s3:PutEncryptionConfiguration",
+        "s3:PutBucketPublicAccessBlock", "s3:PutBucketPolicy", "s3:PutBucketTagging"
+      ],
+      "Resource": "arn:aws:s3:::wonderland-tfstate-708919751353-ap-south-1"
+    },
+    {
+      "Sid": "StateVersionsAndLocks",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::wonderland-tfstate-708919751353-ap-south-1/demo/*"
+    },
+    {
+      "Sid": "DeleteOnlyReleasedStateLocks",
+      "Effect": "Allow",
+      "Action": "s3:DeleteObject",
+      "Resource": "arn:aws:s3:::wonderland-tfstate-708919751353-ap-south-1/demo/*.tflock"
+    }
+  ]
+}

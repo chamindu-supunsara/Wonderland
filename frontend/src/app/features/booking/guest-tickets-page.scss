@@ -1,0 +1,19 @@
+.demo-ticket {
+  margin: 1.5rem 0;
+  border: 2px dashed var(--green);
+}
+@media print {
+  nav,
+  button {
+    display: none !important;
+  }
+  .booking-shell {
+    margin: 0;
+    padding: 0;
+  }
+  .demo-ticket {
+    break-inside: avoid;
+    background: white;
+    color: black;
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "mode": "MOCK",
+  "timezone": "Asia/Colombo",
+  "metabase_image": "metabase/metabase:v0.64.1.x",
+  "database_name": "Wonderland MOCK Reporting",
+  "local_database_id": 2,
+  "note": "IDs describe this local instance. Recreate by names and SQL files on a fresh Metabase app database.",
+  "dashboards": [
+    {
+      "name": "Wonderland MOCK Operations",
+      "local_id": 2,
+      "questions": [
+        40,
+        41,
+        42,
+        43
+      ],
+      "layout_note": "Two top charts side by side; hourly chart full width for readable labels; tier chart below."
+    },
+    {
+      "name": "Wonderland MOCK Pipeline Health",
+      "local_id": 3,
+      "questions": [
+        44,
+        45
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": 40,
+      "key": "daily-arrivals",
+      "name": "MOCK - Daily guest arrivals",
+      "display": "bar",
+      "file": "sql/daily-arrivals.sql"
+    },
+    {
+      "id": 41,
+      "key": "popular-rides",
+      "name": "MOCK - Popular rides",
+      "display": "bar",
+      "file": "sql/popular-rides.sql"
+    },
+    {
+      "id": 42,
+      "key": "peak-quiet-hours",
+      "name": "MOCK - Peak and quiet hours (Colombo)",
+      "display": "bar",
+      "file": "sql/peak-quiet-hours.sql"
+    },
+    {
+      "id": 43,
+      "key": "arrivals-by-tier",
+      "name": "MOCK - Guest arrivals by tier",
+      "display": "bar",
+      "file": "sql/arrivals-by-tier.sql"
+    },
+    {
+      "id": 44,
+      "key": "totals-reconciliation",
+      "name": "MOCK - Totals and reconciliation",
+      "display": "table",
+      "file": "sql/totals-reconciliation.sql"
+    },
+    {
+      "id": 45,
+      "key": "worker-health",
+      "name": "MOCK - Worker heartbeat and backlog",
+      "display": "table",
+      "file": "sql/worker-health.sql"
+    }
+  ]
+}
+

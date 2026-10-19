@@ -1,0 +1,122 @@
+:root {
+  --paper: #faf9f5;
+  --ink: #17382e;
+  --muted: #65756a;
+  --line: #dedfd5;
+  --yellow: #f4d75e;
+  --pink: #b73665;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 3px solid var(--pink);
+  outline-offset: 4px;
+}
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  padding: 1rem;
+  background: white;
+  z-index: 10;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+.eyebrow {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 750;
+}
+.page-container {
+  max-width: 1320px;
+  padding: 0 3rem;
+  margin: auto;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 1rem 1.4rem;
+  background: var(--yellow);
+  color: var(--ink);
+  border-radius: 99px;
+  border: 0;
+  text-decoration: none;
+  font-weight: 750;
+  font-size: 0.9rem;
+}
+.status-message {
+  padding: 1.5rem;
+  background: #eef0e8;
+  border-radius: 16px;
+  margin-block: 1.5rem;
+}
+.status-message.error {
+  background: #f8e8ed;
+}
+.status-message button {
+  border: 1px solid currentColor;
+  color: var(--ink);
+  background: transparent;
+  border-radius: 99px;
+  padding: 0.6rem 1rem;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.section-heading h2 {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 750;
+  letter-spacing: -0.06em;
+  margin: 0.7rem 0 0;
+}
+.section-heading > p {
+  color: var(--muted);
+  font-size: 0.87rem;
+}
+@media (max-width: 900px) {
+  .page-container {
+    padding-inline: 1.5rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,167 @@
+<section class="booking-shell">
+  <span class="eyebrow">YOUR NEXT GREAT DAY</span>
+  <h1>Make a date<br />with wonder <span>✦</span></h1>
+  <p>One package for your party. All visit times are in Asia/Colombo (UTC+05:30).</p>
+  <nav>
+    <a routerLink="/bookings">My bookings ↗</a><a routerLink="/tickets">Explore packages</a>
+  </nav>
+  @if (error()) {
+    <div class="notice error" role="alert">{{ error() }}</div>
+  }
+  @if (loading()) {
+    <p role="status">Loading booking options…</p>
+  } @else if (result(); as booking) {
+    <article class="panel success">
+      <span class="eyebrow">RESERVATION RECORDED</span>
+      <h2>
+        {{
+          booking.status === 'PENDING_PAYMENT'
+            ? 'Pending payment'
+            : booking.status === 'CANCELLED'
+              ? 'Cancelled'
+              : booking.status === 'CONFIRMED'
+                ? 'Confirmed · MOCK'
+                : booking.status === 'PAYMENT_FAILED'
+                  ? 'Mock payment failed'
+                  : 'Expired'
+        }}
+      </h2>
+      <p class="reference">{{ booking.reference }}</p>
+      <p>
+        {{ booking.tier_name }} · {{ booking.guest_count }} guest(s) ·
+        {{ booking.amount_minor / 100 | currency: booking.currency }}
+      </p>
+      <p>
+        {{ booking.starts_at | date: 'MMM d, y, h:mm a' : '+0530' }} –
+        {{ booking.ends_at | date: 'h:mm a' : '+0530' }}
+      </p>
+      @if (booking.status === 'PENDING_PAYMENT') {
+        <p>
+          Your hold ends {{ booking.expires_at | date: 'MMM d, h:mm a' : '+0530' }}. Continue to
+          mock checkout to simulate a payment. No real charge is made.
+        </p>
+        <a [routerLink]="['/checkout', booking.id]">Continue to mock checkout →</a>
+      } @else if (booking.status === 'CONFIRMED') {
+        <a [routerLink]="['/bookings', booking.id, 'tickets']">View demonstration tickets →</a>
+      } @else {
+        <p>
+          This reservation no longer holds guest places. Open its details to check the current
+          status.
+        </p>
+      }
+      <a [routerLink]="['/bookings', booking.id]">View reservation →</a>
+    </article>
+  } @else {
+    <div class="booking-grid">
+      <form class="panel" (ngSubmit)="reviewBooking()" #form="ngForm">
+        <fieldset [disabled]="busy() || review() || uncertain()">
+          <label for="tier">Ticket package</label
+          ><select
+            id="tier"
+            name="tier"
+            required
+            [(ngModel)]="tierId"
+            (ngModelChange)="changeTier()"
+          >
+            @for (tier of tiers(); track tier.id) {
+              <option [value]="tier.id">
+                {{ tier.name }} · {{ tier.amount_minor / 100 | currency: tier.currency }}
+              </option>
+            }
+          </select>
+          <label for="guests">Number of guests</label
+          ><input
+            id="guests"
+            name="guests"
+            type="number"
+            required
+            step="1"
+            [min]="tier()?.min_guests ?? 1"
+            [max]="tier()?.max_guests ?? 5"
+            [(ngModel)]="guests"
+          />
+          <small
+            >{{ tier()?.min_guests }}–{{ tier()?.max_guests }} guests. Price is per package.</small
+          >
+          <label for="visit-date">Visit date</label
+          ><input
+            id="visit-date"
+            name="date"
+            type="date"
+            required
+            [min]="policy()?.today"
+            [max]="policy()?.last_date"
+            [(ngModel)]="visitDate"
+            (ngModelChange)="loadSlots()"
+          />
+          <label for="slot">Preferred time slot</label
+          ><select id="slot" name="slot" required [(ngModel)]="slotId">
+            <option value="">Choose a time slot</option>
+            @for (slot of slots(); track slot.id) {
+              <option [value]="slot.id" [disabled]="slot.remaining_guests < guests">
+                {{ slot.starts_at | date: 'h:mm a' : '+0530' }} –
+                {{ slot.ends_at | date: 'h:mm a' : '+0530' }} · {{ slot.remaining_guests }} guest
+                places left
+              </option>
+            }
+          </select>
+          @if (slotsLoading()) {
+            <p role="status">Checking availability…</p>
+          } @else if (!slots().length) {
+            <p>
+              No future slots are available on this date. Choose another date or ask an
+              administrator to add slots.
+            </p>
+          }
+        </fieldset>
+        @if (!review()) {
+          <button
+            class="primary"
+            [disabled]="form.invalid || slotsLoading() || !slots().length || busy()"
+            type="submit"
+          >
+            Review reservation →
+          </button>
+        }
+      </form>
+      <aside class="panel summary">
+        <span class="eyebrow">YOUR PARK DAY</span>
+        <h2>{{ tier()?.name ?? 'Choose a package' }}</h2>
+        <strong class="price">{{
+          (tier()?.amount_minor ?? 0) / 100 | currency: tier()?.currency ?? 'USD'
+        }}</strong>
+        <p>One package · {{ guests }} guest(s)</p>
+        <p>Capacity is checked again when you reserve. Availability may change while you browse.</p>
+        @if (review()) {
+          <div role="region" aria-label="Review reservation">
+            <h3>Ready to reserve?</h3>
+            <p>
+              {{ slot()?.starts_at | date: 'MMM d, y, h:mm a' : '+0530' }} –
+              {{ slot()?.ends_at | date: 'h:mm a' : '+0530' }}
+            </p>
+            <p>A {{ policy()?.hold_minutes }}-minute unpaid hold will reserve your guest places.</p>
+            <button class="primary" type="button" (click)="submit()" [disabled]="busy()">
+              {{
+                busy()
+                  ? 'Reserving…'
+                  : uncertain()
+                    ? 'Retry same reservation'
+                    : 'Reserve pending payment'
+              }}
+            </button>
+            @if (!uncertain()) {
+              <button type="button" (click)="review.set(false)" [disabled]="busy()">
+                Back to form
+              </button>
+            }
+          </div>
+        }
+      </aside>
+    </div>
+    @if (!uncertain()) {
+      <button type="button" (click)="reloadOptions()" [disabled]="busy()">
+        Reload prices and availability
+      </button>
+    }
+  }
+</section>

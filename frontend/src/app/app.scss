@@ -1,0 +1,125 @@
+:host {
+  display: block;
+}
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  min-height: 94px;
+  max-width: 1320px;
+  padding: 1rem 3rem;
+  margin: auto;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.65rem;
+  font-weight: 850;
+  letter-spacing: -0.08em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand-dot {
+  color: var(--pink);
+}
+.brand-mark {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  background: var(--yellow);
+  font-size: 1.8rem;
+  letter-spacing: -0.12em;
+  padding-right: 0.15rem;
+}
+.brand-mark span {
+  position: absolute;
+  top: -9px;
+  right: -3px;
+  color: var(--pink);
+  font-size: 1rem;
+}
+nav {
+  display: flex;
+  gap: 1.8rem;
+  margin-left: auto;
+  font-size: 0.87rem;
+  font-weight: 650;
+}
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding-block: 0.5rem;
+}
+nav a.active {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--pink);
+  text-underline-offset: 0.6rem;
+}
+.header-cta {
+  background: var(--ink);
+  color: white;
+  text-decoration: none;
+  border-radius: 99px;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.header-cta span {
+  margin-left: 0.8rem;
+}
+.site-footer {
+  width: calc(100% - 6rem);
+  border-top: 1px solid var(--line);
+  max-width: 1224px;
+  margin: 5rem auto 0;
+  padding: 2rem 0;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.footer-brand {
+  font-size: 1.2rem;
+}
+.site-footer span {
+  margin-left: auto;
+}
+@media (max-width: 900px) {
+  .site-header {
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+  }
+  .header-cta {
+    display: none;
+  }
+  .site-footer {
+    width: calc(100% - 3rem);
+    margin-inline: auto;
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 540px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1.4rem;
+  }
+  nav {
+    margin-left: 0;
+    gap: 1.6rem;
+  }
+  .site-footer {
+    gap: 0.6rem;
+  }
+  .site-footer span {
+    margin-left: 0;
+    width: 100%;
+  }
+}
