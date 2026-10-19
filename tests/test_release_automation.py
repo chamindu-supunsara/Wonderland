@@ -14,6 +14,20 @@ release = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(release)
 
 
+def test_deployment_authentication_probes_are_real_protected_get_routes():
+    spec = importlib.util.spec_from_file_location(
+        "release_delivery", ROOT / "scripts/promote_release.py"
+    )
+    delivery = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(delivery)
+    routes = json.loads((ROOT / "infra/terraform/routing/routes.json").read_text())
+    assert delivery.AUTHENTICATION_PROBES
+    for path in delivery.AUTHENTICATION_PROBES:
+        assert not routes["GET " + path]["public"], (
+            "A nonexistent URL must not count as an auth test"
+        )
+
+
 @pytest.fixture
 def manifest(tmp_path):
     with ZipFile(tmp_path / "frontend.zip", "w") as archive:

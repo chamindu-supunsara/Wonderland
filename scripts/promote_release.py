@@ -19,6 +19,7 @@ spec = importlib.util.spec_from_file_location('manifest', ROOT / 'scripts/ci/rel
 release = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(release)
 CONTRACT = json.loads((ROOT / 'deploy/automation/contract.json').read_text())
+AUTHENTICATION_PROBES = ('/api/v1/bookings/me', '/api/v1/users/me')
 
 
 def tool(name):
@@ -192,7 +193,7 @@ def verify(images, archive):
     for path in ['/api/v1/attractions', '/api/v1/ticket-tiers']:
         with urllib.request.urlopen(CONTRACT['api_endpoint'] + path, timeout=30) as response:
             checks[path] = response.status == 200 and bool(json.load(response))
-    for path in ['/api/v1/bookings', '/api/v1/users/me']:
+    for path in AUTHENTICATION_PROBES:
         try:
             urllib.request.urlopen(CONTRACT['api_endpoint'] + path, timeout=30)
             checks[path + '_requires_login'] = False
