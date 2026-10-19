@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -6,7 +7,7 @@ import { AdmissionApi, RideUse, Visit } from '../../core/api/admission-api';
 
 @Component({
   selector: 'app-visit-history',
-  imports: [DatePipe, RouterLink],
+  imports: [...PRIME_FORM_UI, DatePipe, RouterLink],
   templateUrl: './visit-history-page.html',
   styleUrl: '../booking/booking.scss',
 })

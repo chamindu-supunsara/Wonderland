@@ -36,12 +36,18 @@
         @default {
           <p>Choose a result to test. A selected result cannot be changed; retrying it is safe.</p>
           @if (!chosen() || chosen() === 'success') {
-            <button class="primary" (click)="complete('success')" [disabled]="busy()">
+            <button pButton class="primary" (click)="complete('success')" [disabled]="busy()">
               {{ chosen() ? 'Retry same mock success' : 'Simulate success' }}
             </button>
           }
           @if (!chosen() || chosen() === 'failure') {
-            <button (click)="complete('failure')" [disabled]="busy()">
+            <button
+              pButton
+              severity="secondary"
+              [outlined]="true"
+              (click)="complete('failure')"
+              [disabled]="busy()"
+            >
               {{ chosen() ? 'Retry same mock failure' : 'Simulate failure' }}
             </button>
           }
@@ -49,7 +55,7 @@
       }
     </article>
   } @else {
-    <button (click)="load()" [disabled]="busy()">
+    <button pButton severity="secondary" [outlined]="true" (click)="load()" [disabled]="busy()">
       {{ busy() ? 'Loading…' : 'Retry loading checkout' }}
     </button>
   }

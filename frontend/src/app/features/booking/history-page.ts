@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -6,7 +7,7 @@ import { Booking, BookingApi } from '../../core/api/booking-api';
 import { bookingError } from './booking-page';
 @Component({
   selector: 'app-history-page',
-  imports: [CurrencyPipe, DatePipe, RouterLink],
+  imports: [...PRIME_FORM_UI, CurrencyPipe, DatePipe, RouterLink],
   templateUrl: './history-page.html',
   styleUrl: './booking.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

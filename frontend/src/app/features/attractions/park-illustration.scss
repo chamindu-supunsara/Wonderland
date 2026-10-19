@@ -1,0 +1,163 @@
+/* Decorative park artwork. No external image requests are needed. */
+
+.hero-art {
+  position: relative;
+  overflow: hidden;
+  min-height: 450px;
+}
+.sun {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--yellow);
+  right: 3rem;
+  top: 2.4rem;
+}
+.hill {
+  position: absolute;
+  width: 650px;
+  height: 380px;
+  border-radius: 50%;
+  bottom: -270px;
+  transform: rotate(-15deg);
+}
+.hill-back {
+  background: #89a985;
+  left: -50px;
+  bottom: -250px;
+}
+.hill-front {
+  background: #39654a;
+  left: 50px;
+}
+.wheel {
+  position: absolute;
+  width: 235px;
+  height: 235px;
+  border: 9px solid #f5f2df;
+  border-radius: 50%;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow:
+    inset 0 0 0 3px #244638,
+    0 0 0 3px #244638;
+  z-index: 2;
+}
+.spoke {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  background: #466553;
+  top: 0;
+  left: calc(50% - 2px);
+}
+.s2 {
+  transform: rotate(45deg);
+}
+.s3 {
+  transform: rotate(90deg);
+}
+.s4 {
+  transform: rotate(135deg);
+}
+.hub {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background: var(--pink);
+  border: 5px solid #faf4dd;
+  border-radius: 50%;
+  top: calc(50% - 14px);
+  left: calc(50% - 14px);
+}
+.wheel-support {
+  position: absolute;
+  top: 230px;
+  height: 230px;
+  width: 9px;
+  background: #244638;
+  left: calc(50% - 5px);
+  transform-origin: top;
+}
+.wheel-support.left {
+  transform: rotate(18deg);
+}
+.wheel-support.right {
+  transform: rotate(-18deg);
+}
+.floating-label {
+  position: absolute;
+  z-index: 3;
+  top: 70px;
+  left: 18px;
+  padding: 1rem;
+  transform: rotate(-9deg);
+  font-size: 0.9rem;
+  box-shadow: 0 8px 25px #26473514;
+}
+.floating-label em {
+  display: block;
+  color: var(--pink);
+  font-family: Georgia, serif;
+  font-size: 1.6rem;
+}
+.art-star {
+  position: absolute;
+  z-index: 3;
+  font-size: 5rem;
+  right: 30px;
+  bottom: 65px;
+  color: #f3c951;
+}
+.park-label {
+  position: absolute;
+  z-index: 3;
+  bottom: 30px;
+  left: 25px;
+  color: #f9f5df;
+  background: #173c30;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  letter-spacing: 0.07em;
+}
+@media (max-width: 700px) {
+  .hero-art {
+    min-height: 330px;
+  }
+  .wheel {
+    top: 40px;
+    width: 200px;
+    height: 200px;
+  }
+  .wheel-support {
+    top: 140px;
+  }
+  .floating-label {
+    top: 30px;
+  }
+}
+.hero-art {
+  background:
+    radial-gradient(circle at 80% 15%, #fff4cf 0, transparent 50%),
+    linear-gradient(145deg, #edf1e5, #cfddbf);
+}
+.sun {
+  box-shadow:
+    0 0 0 16px #edcd7030,
+    0 0 0 34px #edcd7012;
+}
+.floating-label {
+  background: #fffdf5;
+  border: 1px solid #e5e5ce;
+  border-radius: 14px;
+}
+@media (max-width: 700px) {
+  .hero-art {
+    min-height: 320px;
+  }
+}

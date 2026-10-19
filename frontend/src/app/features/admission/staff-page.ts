@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +12,7 @@ import { AuthService } from '../../core/auth/auth-service';
 
 @Component({
   selector: 'app-staff-admission',
-  imports: [FormsModule, RouterLink, DatePipe],
+  imports: [...PRIME_FORM_UI, FormsModule, RouterLink, DatePipe],
   templateUrl: './staff-page.html',
   styleUrl: '../booking/booking.scss',
 })

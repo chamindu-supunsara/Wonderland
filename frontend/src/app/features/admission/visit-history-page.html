@@ -6,7 +6,9 @@
   </p>
   <nav>
     <a routerLink="/bookings">My bookings and tickets</a><a routerLink="/account">My account</a
-    ><button (click)="load()" [disabled]="busy()">Refresh visits</button>
+    ><button pButton severity="secondary" [outlined]="true" (click)="load()" [disabled]="busy()">
+      Refresh visits
+    </button>
   </nav>
   @if (error()) {
     <p class="notice error" role="alert">{{ error() }}</p>
@@ -29,7 +31,13 @@
         >
         <p class="reference">{{ visit.ticket.reference }}</p>
         <p>{{ visit.ride_count }} ride use(s)</p>
-        <button (click)="showRides(visit.id)" [disabled]="busy()">
+        <button
+          pButton
+          severity="secondary"
+          [outlined]="true"
+          (click)="showRides(visit.id)"
+          [disabled]="busy()"
+        >
           View ride history for guest {{ visit.ticket.guest_number }}
         </button>
         @if (selected() === visit.id) {
@@ -42,10 +50,22 @@
             <p>No rides recorded yet.</p>
           }
           <nav>
-            <button (click)="showRides(visit.id, -1)" [disabled]="busy() || rideOffset === 0">
+            <button
+              pButton
+              severity="secondary"
+              [outlined]="true"
+              (click)="showRides(visit.id, -1)"
+              [disabled]="busy() || rideOffset === 0"
+            >
               Previous rides</button
             ><span>Ride page {{ rideOffset / 20 + 1 }}</span
-            ><button (click)="showRides(visit.id, 1)" [disabled]="busy() || rides().length < 20">
+            ><button
+              pButton
+              severity="secondary"
+              [outlined]="true"
+              (click)="showRides(visit.id, 1)"
+              [disabled]="busy() || rides().length < 20"
+            >
               Next rides
             </button>
           </nav>
@@ -56,8 +76,23 @@
     }
   </div>
   <nav>
-    <button (click)="load(-1)" [disabled]="busy() || offset === 0">Previous visits</button
+    <button
+      pButton
+      severity="secondary"
+      [outlined]="true"
+      (click)="load(-1)"
+      [disabled]="busy() || offset === 0"
+    >
+      Previous visits</button
     ><span>Page {{ offset / 20 + 1 }}</span
-    ><button (click)="load(1)" [disabled]="busy() || visits().length < 20">Next visits</button>
+    ><button
+      pButton
+      severity="secondary"
+      [outlined]="true"
+      (click)="load(1)"
+      [disabled]="busy() || visits().length < 20"
+    >
+      Next visits
+    </button>
   </nav>
 </section>

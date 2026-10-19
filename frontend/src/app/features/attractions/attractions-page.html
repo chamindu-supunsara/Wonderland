@@ -1,14 +1,21 @@
 <div class="page-container">
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <span class="eyebrow">A day out of the ordinary</span>
+      <p-tag value="A day out of the ordinary" icon="pi pi-sun" severity="secondary" />
       <h1 id="hero-title">Make room for<br />a little <span>wonder.</span></h1>
       <p>Big thrills. Little discoveries. The kind of day you'll talk about all the way home.</p>
-      <a class="button" href="#experiences"
-        >Explore the experiences <span aria-hidden="true">↗</span></a
-      >
+      <div class="hero-actions">
+        <a pButton routerLink="/book"
+          ><span pButtonLabel>Plan your park day</span
+          ><i class="pi pi-arrow-right" aria-hidden="true"></i
+        ></a>
+        <a class="explore-link" href="#experiences"
+          >Explore the experiences <i class="pi pi-arrow-down" aria-hidden="true"></i
+        ></a>
+      </div>
       <div class="hero-note">
-        <span aria-hidden="true">✦</span> Your people. Your pace. Your perfect park day.
+        <i class="pi pi-heart" aria-hidden="true"></i> Your people. Your pace. Your perfect park
+        day.
       </div>
     </div>
     <div class="hero-art" aria-hidden="true">
@@ -24,9 +31,9 @@
     </div>
   </section>
   <div class="intro-strip">
-    <span>Something for every kind of adventurer</span><span aria-hidden="true">✦</span
-    ><span>From first rides to big thrills</span><span aria-hidden="true">✦</span
-    ><span>Make memories together</span>
+    <span><i class="pi pi-compass" aria-hidden="true"></i> Something for every adventurer</span>
+    <span><i class="pi pi-ticket" aria-hidden="true"></i> Packages for your whole crew</span>
+    <span><i class="pi pi-calendar" aria-hidden="true"></i> A day planned around you</span>
   </div>
   <section id="experiences" class="experiences" aria-labelledby="experiences-title">
     <div class="section-heading">
@@ -39,7 +46,9 @@
     <div class="filters" role="group" aria-label="Filter attractions by category">
       @for (category of categories; track category.value) {
         <button
+          pButton
           type="button"
+          [outlined]="selectedCategory() !== category.value"
           [class.selected]="selectedCategory() === category.value"
           [attr.aria-pressed]="selectedCategory() === category.value"
           (click)="selectedCategory.set(category.value)"
@@ -50,11 +59,23 @@
     </div>
     @if (loading()) {
       <p class="status-message" role="status">Finding your next adventure…</p>
+      <div class="attraction-grid loading-cards" aria-hidden="true">
+        @for (placeholder of [1, 2, 3, 4]; track placeholder) {
+          <div class="ride-card">
+            <p-skeleton height="180px" />
+            <div class="ride-content">
+              <p-skeleton width="65%" height="1.5rem" /><p-skeleton height="4rem" />
+            </div>
+          </div>
+        }
+      </div>
     } @else if (error()) {
       <div class="status-message error" role="alert">
         <h3>We couldn't load the experiences.</h3>
         <p>Please try again in a moment.</p>
-        <button type="button" (click)="load()">Try again</button>
+        <button pButton severity="secondary" [outlined]="true" type="button" (click)="load()">
+          Try again
+        </button>
       </div>
     } @else {
       <p class="results-count" aria-live="polite">
@@ -75,7 +96,11 @@
                       ? '✳'
                       : '↗'
               }}</span
-              ><span class="thrill-tag">{{ ride.thrill_level.toLowerCase() }} thrill</span>
+              ><p-tag
+                class="thrill-tag"
+                [value]="ride.thrill_level.toLowerCase() + ' thrill'"
+                severity="secondary"
+              />
             </div>
             <div class="ride-content">
               <span class="eyebrow">{{ categoryLabel(ride.category) }}</span>

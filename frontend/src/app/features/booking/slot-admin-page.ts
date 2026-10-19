@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +8,7 @@ import { BookingApi, BookingPolicy, VisitSlot } from '../../core/api/booking-api
 import { bookingError } from './booking-page';
 @Component({
   selector: 'app-slot-admin',
-  imports: [FormsModule, RouterLink, DatePipe],
+  imports: [...PRIME_FORM_UI, FormsModule, RouterLink, DatePipe],
   templateUrl: './slot-admin-page.html',
   styleUrl: './booking.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

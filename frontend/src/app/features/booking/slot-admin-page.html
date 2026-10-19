@@ -18,6 +18,7 @@
       <fieldset [disabled]="busy() || !policy()">
         <label for="date">Visit date</label
         ><input
+          pInputText
           id="date"
           name="date"
           type="date"
@@ -28,11 +29,12 @@
           (ngModelChange)="load()"
         />
         <label for="start">Start time</label
-        ><input id="start" name="start" type="time" required [(ngModel)]="start" />
+        ><input pInputText id="start" name="start" type="time" required [(ngModel)]="start" />
         <label for="end">End time</label
-        ><input id="end" name="end" type="time" required [(ngModel)]="end" />
+        ><input pInputText id="end" name="end" type="time" required [(ngModel)]="end" />
         <label for="capacity">Guest capacity</label
         ><input
+          pInputText
           id="capacity"
           name="capacity"
           type="number"
@@ -42,14 +44,16 @@
           required
           [(ngModel)]="capacity"
         />
-        <button class="primary" type="submit" [disabled]="form.invalid">
+        <button pButton class="primary" type="submit" [disabled]="form.invalid">
           {{ busy() ? 'Adding…' : 'Add time slot' }}
         </button>
       </fieldset>
     </form>
     <aside class="panel">
       <h2>Slots on this date</h2>
-      <button (click)="load()" [disabled]="busy()">Refresh availability</button>
+      <button pButton severity="secondary" [outlined]="true" (click)="load()" [disabled]="busy()">
+        Refresh availability
+      </button>
       @for (slot of slots(); track slot.id) {
         <p>
           {{ slot.starts_at | date: 'h:mm a' : '+0530' }} –

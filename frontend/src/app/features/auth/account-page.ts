@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -7,7 +8,7 @@ import { API_BASE_URL } from '../../core/api/api-config';
 
 @Component({
   selector: 'app-account-page',
-  imports: [RouterLink],
+  imports: [...PRIME_FORM_UI, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<section class="account">
     <span class="eyebrow">WONDERLAND ACCOUNT</span>
@@ -20,7 +21,7 @@ import { API_BASE_URL } from '../../core/api/api-config';
     }
     <p class="role">{{ auth.user()?.role === 'administrator' ? 'Administrator' : 'Visitor' }}</p>
     <div class="verification" aria-live="polite">{{ status() }}</div>
-    <button type="button" (click)="verify()" [disabled]="busy()">Check API access again</button>
+    <button pButton type="button" (click)="verify()" [disabled]="busy()">Check API access again</button>
     <div class="links">
       <a routerLink="/tickets">Explore tickets →</a> <a routerLink="/book">Plan a visit →</a
       ><a routerLink="/bookings">My bookings →</a><a routerLink="/visits">My visit history →</a>
@@ -31,7 +32,7 @@ import { API_BASE_URL } from '../../core/api/api-config';
         <a routerLink="/admin">Manage attractions and pricing →</a
         ><a routerLink="/account">My account</a>
       }
-      <button type="button" (click)="logout()">Sign out</button>
+      <button pButton type="button" (click)="logout()">Sign out</button>
     </div>
     <p class="note">
       {{

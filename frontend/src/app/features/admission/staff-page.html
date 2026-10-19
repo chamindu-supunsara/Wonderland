@@ -20,11 +20,14 @@
     <p class="notice">
       A ride request needs verification. Restore its guest before retrying the same request.
     </p>
-    <button (click)="load(true)" [disabled]="busy()">Resume pending guest</button>
+    <button pButton severity="secondary" [outlined]="true" (click)="load(true)" [disabled]="busy()">
+      Resume pending guest
+    </button>
   }
   <form class="panel" (ngSubmit)="load()" #lookupForm="ngForm">
     <label for="ticket-reference">Guest demonstration ticket reference</label>
     <input
+      pInputText
       id="ticket-reference"
       name="reference"
       [(ngModel)]="reference"
@@ -37,7 +40,7 @@
       >Copy one guest’s MOCK reference from their confirmed booking. Each guest checks in
       separately.</small
     >
-    <button class="primary" [disabled]="lookupForm.invalid || busy() || !!pending()">
+    <button pButton class="primary" [disabled]="lookupForm.invalid || busy() || !!pending()">
       Look up ticket
     </button>
   </form>
@@ -52,6 +55,7 @@
       </p>
       <label for="simulation-time">Simulated visit time (Asia/Colombo)</label>
       <input
+        pInputText
         id="simulation-time"
         type="datetime-local"
         [(ngModel)]="simulationTime"
@@ -67,12 +71,26 @@
           Checked in (MOCK): {{ visit.occurred_at | date: 'MMM d, y, h:mm a' : '+0530' }}.
           {{ visit.ride_count }} ride use(s).
         </p>
-        <button (click)="checkIn()" [disabled]="busy() || !!pending() || !simulationTime">
+        <button
+          pButton
+          severity="secondary"
+          [outlined]="true"
+          (click)="checkIn()"
+          [disabled]="busy() || !!pending() || !simulationTime"
+        >
           Verify duplicate check-in
         </button>
         @if (catalogError()) {
           <p class="notice error" role="alert">{{ catalogError() }}</p>
-          <button (click)="loadAttractions()" [disabled]="busy()">Reload active attractions</button>
+          <button
+            pButton
+            severity="secondary"
+            [outlined]="true"
+            (click)="loadAttractions()"
+            [disabled]="busy()"
+          >
+            Reload active attractions
+          </button>
         }
         <label for="ride-attraction">Active ride / attraction</label>
         <select id="ride-attraction" [(ngModel)]="attractionId" [disabled]="busy() || !!pending()">
@@ -92,6 +110,7 @@
           </p>
         }
         <button
+          pButton
           class="primary"
           (click)="recordRide()"
           [disabled]="
@@ -111,7 +130,7 @@
         }
       } @else {
         <p>Not yet checked in. Rides can be recorded after check-in.</p>
-        <button class="primary" (click)="checkIn()" [disabled]="busy() || !simulationTime">
+        <button pButton class="primary" (click)="checkIn()" [disabled]="busy() || !simulationTime">
           Simulate guest check-in
         </button>
       }

@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +17,7 @@ import { TicketTier } from '../../core/api/catalog.models';
 
 @Component({
   selector: 'app-booking-page',
-  imports: [FormsModule, RouterLink, CurrencyPipe, DatePipe],
+  imports: [...PRIME_FORM_UI, FormsModule, RouterLink, CurrencyPipe, DatePipe],
   templateUrl: './booking-page.html',
   styleUrl: './booking.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

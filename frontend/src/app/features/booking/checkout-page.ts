@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { Component, inject, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -17,7 +18,7 @@ export interface Checkout {
 }
 @Component({
   selector: 'app-checkout-page',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [...PRIME_FORM_UI, CurrencyPipe, RouterLink],
   templateUrl: './checkout-page.html',
   styleUrl: './booking.scss',
 })

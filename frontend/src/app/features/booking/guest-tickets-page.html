@@ -6,13 +6,21 @@
   </p>
   <nav>
     <a routerLink="/bookings">My bookings</a
-    ><button (click)="print()" [disabled]="!tickets().length">
+    ><button
+      pButton
+      severity="secondary"
+      [outlined]="true"
+      (click)="print()"
+      [disabled]="!tickets().length"
+    >
       Print / save demonstration tickets
     </button>
   </nav>
   @if (error()) {
     <p class="notice error" role="alert">{{ error() }}</p>
-    <button (click)="load()" [disabled]="loading()">Retry loading</button>
+    <button pButton severity="secondary" [outlined]="true" (click)="load()" [disabled]="loading()">
+      Retry loading
+    </button>
   }
   @if (loading()) {
     <p role="status">Loading tickets…</p>

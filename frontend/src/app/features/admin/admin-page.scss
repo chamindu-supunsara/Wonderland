@@ -86,10 +86,7 @@ button:disabled {
 }
 .admin-tabs {
   display: flex;
-  gap: 0.6rem;
   margin: 2rem 0;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 1rem;
   flex-wrap: wrap;
 }
 .admin-tabs button {
@@ -376,4 +373,37 @@ small {
   .summary strong {
     font-size: 1.5rem;
   }
+}
+
+/* Wonderland layout and surface refinements. */
+
+.admin-heading {
+  padding-top: 1rem;
+}
+.admin-heading h1 {
+  font-weight: 650;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+.summary {
+  background: #f2f5ec;
+  border-color: #dce5d5;
+}
+.summary strong {
+  font-weight: 650;
+  letter-spacing: -0.05em;
+}
+.editor,
+.price-editor {
+  background: #fff;
+  border-color: var(--line);
+}
+.admin-tabs {
+  gap: 0.6rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1rem;
+}
+.admin-tabs button.selected {
+  background: #173c30;
+  color: white;
+  border-color: #173c30;
 }

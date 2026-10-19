@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -16,7 +17,7 @@ export interface GuestTicket {
 }
 @Component({
   selector: 'app-guest-tickets-page',
-  imports: [DatePipe, RouterLink],
+  imports: [...PRIME_FORM_UI, DatePipe, RouterLink],
   templateUrl: './guest-tickets-page.html',
   styleUrls: ['./booking.scss', './guest-tickets-page.scss'],
 })

@@ -3,7 +3,6 @@
   padding: 3.2rem 1rem;
 }
 .ticket-intro h1 {
-  font-size: clamp(3rem, 6vw, 5rem);
   letter-spacing: -0.07em;
   line-height: 1.05;
   margin: 1rem 0 1.5rem;
@@ -17,17 +16,10 @@
 .tier-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
 }
 .tier-card {
   background: white;
   border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 1.8rem 1.4rem;
-}
-.tier-card.family {
-  background: #e8eddf;
-  border-color: #a2b293;
 }
 .tier-card h2 {
   font-size: 1.65rem;
@@ -69,8 +61,6 @@ ul {
   display: flex;
   gap: 1.5rem;
   padding: 2rem;
-  background: #f4ecd6;
-  border-radius: 16px;
 }
 .booking-notice > span {
   font-size: 3rem;
@@ -102,5 +92,94 @@ ul {
   .booking-notice {
     padding: 1.4rem;
     gap: 1rem;
+  }
+}
+
+/* Wonderland layout and surface refinements. */
+
+.ticket-intro {
+  padding-top: 3.5rem;
+}
+.ticket-intro h1 {
+  font-weight: 650;
+  font-size: clamp(2.7rem, 5vw, 4.3rem);
+}
+.tier-grid {
+  gap: 1.3rem;
+  align-items: stretch;
+}
+.tier-card {
+  position: relative;
+  border-color: #dde5d8;
+  padding: 1.8rem;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px #173c3006;
+  transition: transform 0.2s;
+}
+.tier-card:hover {
+  transform: translateY(-4px);
+}
+.tier-card.family {
+  background: #f1f5e9;
+  border-color: #8da57d;
+}
+.package-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: #eef2e9;
+  margin-bottom: 1.5rem;
+  color: #38694b;
+}
+.package-icon i {
+  font-size: 1.3rem;
+}
+.family .package-icon {
+  background: #dfe9d3;
+}
+.tier-card h2 {
+  font-weight: 650;
+  margin-bottom: 1.2rem;
+}
+.tier-card .price {
+  font-weight: 650;
+  margin-bottom: 1.4rem;
+}
+.tier-card ul {
+  list-style: none;
+  padding-left: 0;
+  font-size: 0.79rem;
+}
+.tier-card li::before {
+  content: '✓';
+  color: #287c59;
+  margin-right: 0.55rem;
+  font-weight: 700;
+}
+.tier-card a {
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  text-decoration: none;
+}
+.family-label {
+  display: block;
+  margin-top: 1rem;
+  text-align: center;
+}
+.booking-notice {
+  background: #f6f0df;
+  border: 1px solid #e9dfc4;
+  border-radius: 14px;
+}
+@media (max-width: 540px) {
+  .ticket-intro {
+    padding-top: 1.5rem;
+  }
+  .tier-card {
+    padding: 1.5rem;
   }
 }

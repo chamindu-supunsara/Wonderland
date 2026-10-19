@@ -12,7 +12,14 @@
   @if (error()) {
     <p class="notice error" role="alert">{{ error() }}</p>
   }
-  <button type="button" (click)="load()" [disabled]="loading() || busy()">
+  <button
+    pButton
+    severity="secondary"
+    [outlined]="true"
+    type="button"
+    (click)="load()"
+    [disabled]="loading() || busy()"
+  >
     Refresh booking status
   </button>
   @if (loading()) {
@@ -55,12 +62,32 @@
                   Cancel this unpaid reservation and release {{ booking.guest_count }} guest
                   place(s)?
                 </p>
-                <button (click)="cancel(booking.id)" [disabled]="busy()">
+                <button
+                  pButton
+                  severity="secondary"
+                  [outlined]="true"
+                  (click)="cancel(booking.id)"
+                  [disabled]="busy()"
+                >
                   Confirm cancellation</button
-                ><button (click)="confirm.set(null)" [disabled]="busy()">Keep reservation</button>
+                ><button
+                  pButton
+                  severity="secondary"
+                  [outlined]="true"
+                  (click)="confirm.set(null)"
+                  [disabled]="busy()"
+                >
+                  Keep reservation
+                </button>
               </div>
             } @else {
-              <button (click)="confirm.set(booking.id)" [disabled]="busy()">
+              <button
+                pButton
+                severity="secondary"
+                [outlined]="true"
+                (click)="confirm.set(booking.id)"
+                [disabled]="busy()"
+              >
                 Cancel unpaid reservation
               </button>
             }
@@ -81,9 +108,24 @@
     </div>
     @if (!id) {
       <nav>
-        <button (click)="page(-1)" [disabled]="offset === 0 || busy()">Previous</button
+        <button
+          pButton
+          severity="secondary"
+          [outlined]="true"
+          (click)="page(-1)"
+          [disabled]="offset === 0 || busy()"
+        >
+          Previous</button
         ><span>Page {{ offset / 20 + 1 }}</span
-        ><button (click)="page(1)" [disabled]="rows().length < 20 || busy()">Next</button>
+        ><button
+          pButton
+          severity="secondary"
+          [outlined]="true"
+          (click)="page(1)"
+          [disabled]="rows().length < 20 || busy()"
+        >
+          Next
+        </button>
       </nav>
     }
   }

@@ -1,22 +1,69 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
+<div class="welcome-bar">
+  <i class="pi pi-sparkles" aria-hidden="true"></i> A little adventure. A lot of memories.
+</div>
 <header class="site-header">
-  <a class="brand" routerLink="/" aria-label="Wonderland home"
-    ><span class="brand-mark" aria-hidden="true">w<span>✦</span></span
-    >wonderland<span class="brand-dot">.</span></a
+  <a class="brand" routerLink="/" aria-label="Wonderland home">
+    <span class="brand-mark" aria-hidden="true"><i class="pi pi-sun"></i></span>
+    wonderland<span class="brand-dot">.</span>
+  </a>
+  <button
+    pButton
+    class="menu-toggle"
+    type="button"
+    severity="secondary"
+    [outlined]="true"
+    [attr.aria-expanded]="menuOpen()"
+    aria-controls="main-navigation"
+    (click)="menuOpen.set(!menuOpen())"
+    aria-label="Toggle navigation"
   >
-  <nav aria-label="Main navigation">
+    <i [class]="menuOpen() ? 'pi pi-times' : 'pi pi-bars'" aria-hidden="true"></i>
+  </button>
+  <nav
+    id="main-navigation"
+    aria-label="Main navigation"
+    [class.open]="menuOpen()"
+    (click)="menuOpen.set(false)"
+  >
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
       >Explore the park</a
-    ><a routerLink="/tickets" routerLinkActive="active">Tickets &amp; tiers</a>
-    <a [routerLink]="auth.user() ? '/account' : '/login'" routerLinkActive="active">{{ auth.user() ? 'My account' : 'Sign in' }}</a>
+    >
+    <a routerLink="/tickets" routerLinkActive="active">Tickets &amp; tiers</a>
+    @if (auth.user()) {
+      <a routerLink="/bookings" routerLinkActive="active">My bookings</a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="active">Administration</a>
+      }
+    }
+    <a
+      class="account-link"
+      [routerLink]="auth.user() ? '/account' : '/login'"
+      routerLinkActive="active"
+    >
+      <i class="pi pi-user" aria-hidden="true"></i>{{ auth.user() ? 'My account' : 'Sign in' }}
+    </a>
   </nav>
-  <a class="header-cta" routerLink="/tickets"
-    >Find your adventure <span aria-hidden="true">↗</span></a
-  >
+  <a pButton class="header-cta" routerLink="/book"
+    ><span pButtonLabel>Plan your visit</span><i class="pi pi-arrow-up-right" aria-hidden="true"></i
+  ></a>
 </header>
 <main id="main-content" tabindex="-1"><router-outlet /></main>
 <footer class="site-footer">
-  <a class="brand footer-brand" routerLink="/">wonderland.</a>
-  <p>A little adventure. A lot of memories.</p>
-  <span>Wonderland theme park</span>
+  <div class="footer-top">
+    <div>
+      <a class="brand" routerLink="/">wonderland<span class="brand-dot">.</span></a>
+      <p>Good days are better together.</p>
+    </div>
+    <nav aria-label="Footer navigation">
+      <a routerLink="/">Explore</a><a routerLink="/tickets">Ticket packages</a
+      ><a routerLink="/bookings">My bookings</a><a routerLink="/account">My account</a>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <span>Wonderland theme park · A demonstration experience</span
+    ><span
+      ><i class="pi pi-info-circle" aria-hidden="true"></i> Mock checkout. No real charges.</span
+    >
+  </div>
 </footer>

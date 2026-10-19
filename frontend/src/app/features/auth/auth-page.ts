@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -9,7 +10,7 @@ type Stage = 'login' | 'signup' | 'confirm' | 'reset' | 'reset-code' | 'new-pass
 
 @Component({
   selector: 'app-auth-page',
-  imports: [FormsModule, RouterLink],
+  imports: [...PRIME_FORM_UI, FormsModule, RouterLink],
   templateUrl: './auth-page.html',
   styleUrl: './auth-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

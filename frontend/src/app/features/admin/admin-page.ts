@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -16,7 +17,7 @@ import {
 
 @Component({
   selector: 'app-admin-page',
-  imports: [FormsModule, RouterLink, CurrencyPipe, DatePipe],
+  imports: [...PRIME_FORM_UI, FormsModule, RouterLink, CurrencyPipe, DatePipe],
   templateUrl: './admin-page.html',
   styleUrl: './admin-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

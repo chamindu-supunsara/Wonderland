@@ -71,6 +71,7 @@
           </select>
           <label for="guests">Number of guests</label
           ><input
+            pInputText
             id="guests"
             name="guests"
             type="number"
@@ -85,6 +86,7 @@
           >
           <label for="visit-date">Visit date</label
           ><input
+            pInputText
             id="visit-date"
             name="date"
             type="date"
@@ -116,6 +118,7 @@
         </fieldset>
         @if (!review()) {
           <button
+            pButton
             class="primary"
             [disabled]="form.invalid || slotsLoading() || !slots().length || busy()"
             type="submit"
@@ -140,7 +143,7 @@
               {{ slot()?.ends_at | date: 'h:mm a' : '+0530' }}
             </p>
             <p>A {{ policy()?.hold_minutes }}-minute unpaid hold will reserve your guest places.</p>
-            <button class="primary" type="button" (click)="submit()" [disabled]="busy()">
+            <button pButton class="primary" type="button" (click)="submit()" [disabled]="busy()">
               {{
                 busy()
                   ? 'Reserving…'
@@ -150,7 +153,14 @@
               }}
             </button>
             @if (!uncertain()) {
-              <button type="button" (click)="review.set(false)" [disabled]="busy()">
+              <button
+                pButton
+                severity="secondary"
+                [outlined]="true"
+                type="button"
+                (click)="review.set(false)"
+                [disabled]="busy()"
+              >
                 Back to form
               </button>
             }
@@ -159,7 +169,14 @@
       </aside>
     </div>
     @if (!uncertain()) {
-      <button type="button" (click)="reloadOptions()" [disabled]="busy()">
+      <button
+        pButton
+        severity="secondary"
+        [outlined]="true"
+        type="button"
+        (click)="reloadOptions()"
+        [disabled]="busy()"
+      >
         Reload prices and availability
       </button>
     }

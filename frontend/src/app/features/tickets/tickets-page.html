@@ -10,12 +10,27 @@
     <div class="status-message error" role="alert">
       <h2>We couldn't load the ticket tiers.</h2>
       <p>Please try again in a moment.</p>
-      <button type="button" (click)="load()">Try again</button>
+      <button pButton severity="secondary" [outlined]="true" type="button" (click)="load()">
+        Try again
+      </button>
     </div>
   } @else {
     <div class="tier-grid">
       @for (tier of tiers(); track tier.id) {
         <article class="tier-card" [class.family]="tier.code === 'FAMILY'">
+          <div class="package-icon" aria-hidden="true">
+            <i
+              [class]="
+                tier.code === 'INDIVIDUAL'
+                  ? 'pi pi-user'
+                  : tier.code === 'COUPLE'
+                    ? 'pi pi-heart'
+                    : tier.code === 'FAMILY'
+                      ? 'pi pi-home'
+                      : 'pi pi-users'
+              "
+            ></i>
+          </div>
           <span class="eyebrow">{{
             tier.min_guests === tier.max_guests
               ? tier.max_guests + (tier.max_guests === 1 ? ' guest' : ' guests')
@@ -31,7 +46,13 @@
             <li>Choose your date and time slot</li>
             <li>Digital tickets for each guest</li>
           </ul>
-          <a routerLink="/book" [queryParams]="{tier:tier.id}">Choose your visit →</a>
+          <a pButton routerLink="/book" [queryParams]="{ tier: tier.id }"
+            ><span pButtonLabel>Choose your visit</span
+            ><i class="pi pi-arrow-right" aria-hidden="true"></i
+          ></a>
+          @if (tier.code === 'FAMILY') {
+            <p-tag class="family-label" value="For family days" severity="secondary" />
+          }
         </article>
       } @empty {
         <p class="status-message">
@@ -52,7 +73,7 @@
       <h2>Plan a little wonder.</h2>
       <p>
         Choose your date and available time slot to reserve guest places. Reservations remain
-        pending payment; checkout and digital tickets arrive in a later step.
+        pending payment until you complete mock checkout. No real charge is made.
       </p>
     </div>
   </aside>

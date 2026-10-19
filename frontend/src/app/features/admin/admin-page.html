@@ -1,6 +1,8 @@
 <section class="admin-shell">
   @if (localAnalytics) {
-    <a href="http://127.0.0.1:3000" target="_blank" rel="noopener">Open local MOCK analytics in Metabase ↗</a>
+    <a href="http://127.0.0.1:3000" target="_blank" rel="noopener"
+      >Open local MOCK analytics in Metabase ↗</a
+    >
   } @else {
     <p>Analytics dashboards are available through the private staff Metabase connection.</p>
   }
@@ -25,6 +27,9 @@
   </div>
   <nav class="admin-tabs" aria-label="Administrator sections">
     <button
+      pButton
+      severity="secondary"
+      [outlined]="true"
       type="button"
       [class.selected]="section() === 'attractions'"
       [attr.aria-pressed]="section() === 'attractions'"
@@ -34,6 +39,9 @@
       Attractions
     </button>
     <button
+      pButton
+      severity="secondary"
+      [outlined]="true"
       type="button"
       [class.selected]="section() === 'pricing'"
       [attr.aria-pressed]="section() === 'pricing'"
@@ -43,6 +51,9 @@
       Ticket pricing
     </button>
     <button
+      pButton
+      severity="secondary"
+      [outlined]="true"
       type="button"
       [class.selected]="section() === 'activity'"
       [attr.aria-pressed]="section() === 'activity'"
@@ -58,7 +69,14 @@
   @if (error()) {
     <div class="notice error" role="alert">
       <p>{{ error() }}</p>
-      <button type="button" (click)="reloadLatest()" [disabled]="saving() || loading()">
+      <button
+        pButton
+        severity="secondary"
+        [outlined]="true"
+        type="button"
+        (click)="reloadLatest()"
+        [disabled]="saving() || loading()"
+      >
         Reload latest data (discard form)</button
       ><a routerLink="/account">My account</a>
     </div>
@@ -73,6 +91,7 @@
         <p>Retirement removes an experience from public browsing and keeps its history.</p>
       </div>
       <button
+        pButton
         type="button"
         class="primary"
         (click)="begin('new')"
@@ -91,6 +110,7 @@
               <div class="wide">
                 <label for="ride-name">Attraction name</label
                 ><input
+                  pInputText
                   id="ride-name"
                   name="name"
                   [(ngModel)]="draft.name"
@@ -101,6 +121,7 @@
               <div class="wide">
                 <label for="description">Description</label
                 ><textarea
+                  pTextarea
                   id="description"
                   name="description"
                   [(ngModel)]="draft.description"
@@ -128,6 +149,7 @@
               <div>
                 <label for="age">Minimum age (optional)</label
                 ><input
+                  pInputText
                   id="age"
                   name="age"
                   type="number"
@@ -140,6 +162,7 @@
               <div>
                 <label for="height">Minimum height in cm (optional)</label
                 ><input
+                  pInputText
                   id="height"
                   name="height"
                   type="number"
@@ -152,6 +175,7 @@
               <div class="wide">
                 <label for="guidance">Visitor guidance</label
                 ><textarea
+                  pTextarea
                   id="guidance"
                   name="guidance"
                   [(ngModel)]="draft.guidance_text"
@@ -162,9 +186,22 @@
               </div>
             </div>
             <div class="actions">
-              <button class="primary" type="submit" [disabled]="!attractionForm.valid || saving()">
+              <button
+                pButton
+                class="primary"
+                type="submit"
+                [disabled]="!attractionForm.valid || saving()"
+              >
                 {{ saving() ? 'Saving…' : 'Save attraction' }}</button
-              ><button type="button" (click)="editor.set(null)">Cancel</button>
+              ><button
+                pButton
+                severity="secondary"
+                [outlined]="true"
+                type="button"
+                (click)="editor.set(null)"
+              >
+                Cancel
+              </button>
             </div>
           </fieldset>
         </form>
@@ -178,9 +215,16 @@
           Retired records are read only.
         </p>
         <div class="actions">
-          <button class="danger" type="button" (click)="retire()" [disabled]="saving()">
+          <button pButton class="danger" type="button" (click)="retire()" [disabled]="saving()">
             {{ saving() ? 'Retiring…' : 'Confirm retirement' }}</button
-          ><button type="button" (click)="retirement.set(null)" [disabled]="saving()">
+          ><button
+            pButton
+            severity="secondary"
+            [outlined]="true"
+            type="button"
+            (click)="retirement.set(null)"
+            [disabled]="saving()"
+          >
             Cancel
           </button>
         </div>
@@ -190,6 +234,7 @@
       <div>
         <label for="search">Search attractions</label
         ><input
+          pInputText
           id="search"
           type="search"
           [ngModel]="search()"
@@ -239,6 +284,9 @@
             @if (ride.status === 'ACTIVE') {
               <div class="actions">
                 <button
+                  pButton
+                  severity="secondary"
+                  [outlined]="true"
                   type="button"
                   (click)="begin(ride)"
                   [disabled]="saving() || loading()"
@@ -246,6 +294,9 @@
                 >
                   Edit</button
                 ><button
+                  pButton
+                  severity="secondary"
+                  [outlined]="true"
                   class="retire-link"
                   type="button"
                   (click)="retirement.set(ride); editor.set(null); error.set('')"
@@ -276,6 +327,9 @@
       <div class="tier-list">
         @for (tier of tiers(); track tier.id) {
           <button
+            pButton
+            severity="secondary"
+            [outlined]="true"
             class="tier-card"
             type="button"
             (click)="selectTier(tier)"
@@ -308,6 +362,7 @@
           <form #priceForm="ngForm" (ngSubmit)="priceForm.valid && reviewPrice()">
             <label for="new-price">New package price (USD)</label
             ><input
+              pInputText
               id="new-price"
               name="price"
               type="text"
@@ -320,6 +375,7 @@
               [disabled]="saving()"
             /><small>Positive amount, up to two decimal places. Example: 42.50</small
             ><button
+              pButton
               class="primary"
               type="submit"
               [disabled]="!priceForm.valid || saving() || loading()"
@@ -334,9 +390,22 @@
                 {{ tier.name }}, replacing {{ tier.amount_minor / 100 | currency: tier.currency }}?
               </p>
               <div class="actions">
-                <button type="button" class="primary" (click)="publish()" [disabled]="saving()">
+                <button
+                  pButton
+                  type="button"
+                  class="primary"
+                  (click)="publish()"
+                  [disabled]="saving()"
+                >
                   {{ saving() ? 'Publishing…' : 'Publish price' }}</button
-                ><button type="button" (click)="priceConfirmation.set(null)" [disabled]="saving()">
+                ><button
+                  pButton
+                  severity="secondary"
+                  [outlined]="true"
+                  type="button"
+                  (click)="priceConfirmation.set(null)"
+                  [disabled]="saving()"
+                >
                   Cancel
                 </button>
               </div>
@@ -385,7 +454,14 @@
         <h2>Recent activity</h2>
         <p>The latest 30 successful administrator changes, recorded with the database update.</p>
       </div>
-      <button type="button" (click)="load()" [disabled]="loading() || saving()">
+      <button
+        pButton
+        severity="secondary"
+        [outlined]="true"
+        type="button"
+        (click)="load()"
+        [disabled]="loading() || saving()"
+      >
         Refresh activity
       </button>
     </div>

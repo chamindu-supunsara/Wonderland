@@ -8,10 +8,8 @@
   min-height: 60vh;
 }
 h1 {
-  font-size: clamp(2.5rem, 5vw, 4.6rem);
   line-height: 1.05;
   letter-spacing: -0.05em;
-  font-weight: 600;
 }
 h1 span {
   color: var(--pink);
@@ -32,14 +30,10 @@ nav {
 .booking-grid {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
-  gap: 2rem;
   margin: 2rem 0;
 }
 .panel {
-  background: #fffefa;
   border: 1px solid var(--line);
-  padding: 2rem;
-  border-radius: 1.2rem;
   overflow-wrap: anywhere;
 }
 .summary {
@@ -135,6 +129,51 @@ button:disabled {
   }
   .booking-grid {
     grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 1.3rem;
+  }
+}
+
+/* Wonderland layout and surface refinements. */
+
+.booking-shell {
+  margin-top: 2.5rem;
+}
+h1 {
+  font-size: clamp(2.3rem, 4.5vw, 3.6rem);
+  font-weight: 650;
+  margin-block: 1rem;
+}
+.panel {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.8rem;
+}
+nav a {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-underline-offset: 4px;
+  text-decoration-color: #c4d2c1;
+}
+.notice {
+  font-size: 0.88rem;
+}
+.booking-grid {
+  gap: 1.5rem;
+}
+.summary {
+  position: sticky;
+  top: 1.5rem;
+  background: #f2f5ec;
+}
+.price {
+  font-weight: 650;
+  letter-spacing: -0.05em;
+}
+@media (max-width: 760px) {
+  .summary {
+    position: static;
   }
   .panel {
     padding: 1.3rem;

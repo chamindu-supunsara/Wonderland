@@ -1,3 +1,4 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,12 +11,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { CatalogApi } from '../../core/api/catalog-api';
 import { Attraction } from '../../core/api/catalog.models';
+import { TagModule } from 'primeng/tag';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-attractions-page',
-  imports: [RouterLink],
+  imports: [...PRIME_FORM_UI, RouterLink, TagModule, SkeletonModule],
   templateUrl: './attractions-page.html',
-  styleUrl: './attractions-page.scss',
+  styleUrls: ['./attractions-page.scss', './park-illustration.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttractionsPage {

@@ -1,13 +1,15 @@
+import { PRIME_FORM_UI } from '../../shared/prime-ui';
 import { CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CatalogApi } from '../../core/api/catalog-api';
 import { TicketTier } from '../../core/api/catalog.models';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-tickets-page',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [...PRIME_FORM_UI, CurrencyPipe, RouterLink, TagModule],
   templateUrl: './tickets-page.html',
   styleUrl: './tickets-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
