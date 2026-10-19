@@ -146,5 +146,5 @@ Review changes and make your first commit when ready. No remote repository is in
 
 ## What comes next
 
-Managed identity and role checks, then protected administrator attraction/pricing changes. Booking follows with date/slot selection, capacity, idempotency, history, and event integration. Use `docs/REQUIREMENTS.md` to ensure later work covers every assignment component.
+Managed identity and role checks, then protected administrator attraction/pricing changes. Booking follows with date/slot selection, capacity, idempotency, history, and event integration. Use `docs/PROJECT_STATUS.md` to ensure later work covers every assignment component.
 
