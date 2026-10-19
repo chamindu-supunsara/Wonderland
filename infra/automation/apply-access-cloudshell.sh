@@ -2,7 +2,7 @@
 set -euo pipefail
 cd -- "$(dirname -- "$0")"
 [[ "$(aws sts get-caller-identity --query Account --output text)" == 708919751353 ]] || exit 1
-echo "acbeb2bd1b45374dd788e885ce0b610dfc767d50a7cd73cd52c8d2627a82035a  github-release-access.json" | sha256sum --check
+echo "d50e1b4663db798d7273404e527ba6b845c25bae70d450374807642242a4a812  github-release-access.json" | sha256sum --check
 case "${1:---prepare}" in
   --prepare)
     aws cloudformation validate-template --region ap-south-1 --template-body file://github-release-access.json >/dev/null

@@ -1,6 +1,6 @@
 # Step 11 — tested mock releases and controlled deployment
 
-Status: **hosted CI verified; AWS release and promotion pending**. All 211 hosted Python tests, Angular checks and all five Terraform root validations passed. Main requires the three checks and blocks force pushes/deletion, with an administrator bypass. The first OIDC publish attempt failed because its trust used the legacy name-only subject; this new repository uses immutable owner/repository IDs. The template now matches the immutable subject below, but its owner-side AWS update must be verified before retrying publishing. Checkout, Admission and Analytics stay mock.
+Status: **complete for the controlled mock-delivery scope**. The owner OIDC correction, real GitHub release, artifact verification, deployment, rollback and final re-deployment passed. The released commit passed **212 Python tests**, Angular checks and all five Terraform root validations. Each of the three delivery/recovery stages passed **23 checks**. Main requires the three CI checks and blocks force pushes/deletion, with an administrator bypass. Checkout, Admission and Analytics stay mock. See the [execution summary](11-deployment-evidence.md).
 
 ## 1. Pipeline and access boundaries
 
@@ -8,15 +8,15 @@ Repository: https://github.com/chamindu-supunsara/Wonderland. Pull requests and 
 
 The manually dispatched **Mock release** workflow repeats the checks for its exact main commit, builds five Linux/amd64 service images, uploads them to the existing ECR repositories and saves an immutable GitHub artifact containing `manifest.json` and `frontend.zip`. The manifest records commit, run/attempt, image digests, frontend checksum and approved chart/migration fingerprints. Artifacts expire after seven days; retain the local known-good release and existing images for the agreed recovery period.
 
-Verified source/checks: commit `2ee30711e5ab9fd512c9fe8370adc81c048fcc0a`, [hosted CI run](https://github.com/chamindu-supunsara/Wonderland/actions/runs/39208674415). The five runtime images and hosted frontend have not been promoted by Step 11 yet. The approved operator `/32` was refreshed through a one-field Terraform plan and all twelve existing Deployments were healthy afterward; no capacity was added.
+Verified released source: commit `88ee70c6cc93a468c9fb248d9f3f3dd54507fd64`, [successful mock release](https://github.com/chamindu-supunsara/Wonderland/actions/runs/39210950664). Its five immutable image digests and tested Angular bundle are deployed. Helm revision 8 and Amplify job 6 are the final running release; revisions 6/7 and jobs 4/5 demonstrate deployment and recovery. The approved operator `/32` was refreshed through a one-field Terraform plan, with no further foundation changes or added capacity.
 
-GitHub OIDC is designed to grant temporary AWS credentials through `wonderland-github-release`. The corrected trust matches exactly `repo:chamindu-supunsara@80322623/Wonderland@1425166882:ref:refs/heads/main` and audience `sts.amazonaws.com`. Verify this exact value in AWS after the owner update. The role can authenticate to ECR and publish only to the five named existing repositories. It cannot read secrets, deploy to EKS, apply Terraform, create repositories or change the frontend. No static AWS access key belongs in GitHub secrets. See [GitHub's AWS OIDC guide](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws) and [immutable subject format](https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-GitHub-actions-oidc-tokens/).
+GitHub OIDC grants temporary AWS credentials through `wonderland-github-release`. The live trust matches exactly `repo:chamindu-supunsara@80322623/Wonderland@1425166882:ref:refs/heads/main` and audience `sts.amazonaws.com`. Seven live access checks passed, and the GitHub credentials step successfully assumed this role. It can authenticate to ECR and publish only to the five named existing repositories. It cannot read secrets, deploy to EKS, apply Terraform, create repositories or change the frontend. No static AWS access key belongs in GitHub secrets. See [GitHub's AWS OIDC guide](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws) and [immutable subject format](https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-GitHub-actions-oidc-tokens/).
 
 The final promotion runs on your existing Windows computer using temporary WonderlandFeasibility SSO and the existing EKS operator `/32`. This keeps the cluster API restricted and avoids another runner host or broad GitHub runner IP ranges. No persistent self-hosted GitHub runner is installed. This is automated CI/build with an explicit operator-controlled delivery stage; it is not unattended deployment on every push.
 
 ## 2. Costs and cleanup
 
-The previous USD 64.41 model plus USD 1 image-storage reserve gives **USD 65.41 before exclusions**, within the USD 75 allowance. No extra EC2, RDS, NAT or ALB is created. Public repository standard hosted runners currently have free usage; check current GitHub account terms before switching visibility or runner types. AWS storage, transfer, taxes and retained artifacts still vary. The delayed 18 October account estimate was USD 4.16 at preparation; it is not the current or final bill.
+The previous USD 64.41 model plus USD 1 image-storage reserve gives **USD 65.41 before exclusions**, within the USD 75 allowance. No extra EC2, RDS, NAT or ALB was created. Public repository standard hosted runners currently have free usage; check current GitHub account terms before switching visibility or runner types. AWS storage, transfer, taxes and retained artifacts still vary. Delayed account billing observations stay in local evidence; the current/final bill is not verified and USD 75 is not an AWS-enforced cap.
 
 Keep cleanup on **25 October 2026, 6 PM Asia/Colombo**. Promotion refuses after that deadline. Preserve state, database snapshot, encryption key and known-good images/archives through the agreed **8 November, 6 PM** recovery review. Delete the OIDC role/stack at teardown if no further publishing is needed; first check whether the provider is shared before removing it. Never delete images needed for recovery.
 
@@ -29,7 +29,9 @@ bash apply-access-cloudshell.sh --prepare
 bash apply-access-cloudshell.sh --apply
 ```
 
-Preparation validates the template and prints Access Analyzer findings; inspect them before applying. The helper verifies account 708919751353 and the exact template hash. If an OIDC provider already exists, it stops for an explicit reuse review. Do not use the developer role to grant itself access. This setup creates only the provider and named publishing role.
+Preparation validates the template and prints Access Analyzer findings; inspect them before applying. The helper verifies account 708919751353 and the exact template hash. It reuses an existing provider only when that provider belongs to this same CloudFormation stack; otherwise it stops for a reuse review. Do not use the developer role to grant itself access. This setup manages only the provider and named publishing role. Generated templates use LF line endings so their hashes match on Windows and Linux.
+
+The completed owner correction ended with `Successfully created/updated stack - wonderland-github-release-access` and exit code `0`; AWS independently reported `UPDATE_COMPLETE`. Exact stdout/stderr is saved locally as `docs/evidence/step11-owner-oidc-correction-output.txt`, checksum `723cf4658042e7c58568c0ad4154d4cb6f6ffdff138ca72cd8d27442a28e9274`. The approved template was downloaded from pinned source and checked before application. `scripts/verify_automation_access.py` records the live trust/policy/provider checks without reading credentials.
 
 ## 4. Daily development and CI
 
@@ -88,3 +90,17 @@ Rollback refuses if live images changed again. It restores the saved frontend an
 Record repository URL, source commit, hosted check/run links, OIDC role/trust, digest manifest, prepared review, deployment and verification outcomes, elapsed time and rollback evidence. Keep sanitized summaries in the repository and raw operator/guest evidence locally. A prepared YAML file alone is not proof of a passing hosted pipeline.
 
 Step 12A provider sandbox and remaining features, Step 12B measured reliability/scaling/restore checks and Step 12C submission/viva remain separate milestones. This automation keeps payment mock and does not make those requirements complete.
+
+## 9. Verified execution and evidence
+
+The first publish attempt correctly failed when the old name-only trust did not match this repository's immutable subject. Correcting the exact identity enabled OIDC without widening the policy. The first rollout then exposed a probe bug: `GET /api/v1/bookings` is not a configured GET route, so 404 must not count as failed authentication enforcement. The probe now uses `/api/v1/bookings/me`; a regression test checks every authentication probe against the authoritative route map. The corrected source was released and all three delivery stages passed.
+
+| Stage | Helm revision | Amplify job | Checks | Finished 19 October, Asia/Colombo |
+|---|---:|---:|---:|---|
+| Corrected deployment | 6 | 4 | 23/23 | 12:14 PM |
+| Restore prior release | 7 | 5 | 23/23 | 12:16 PM |
+| Final corrected release | 8 | 6 | 23/23 | 12:20 PM |
+
+The hosted release took about four minutes; each deployment/recovery stage took about two to three minutes in this rehearsal. Purchase/guest/ride facts remained at two purchases, two guest tickets, USD 80 simulated revenue, one arrival and two ride uses before deployment, after rollback and after final re-deployment. Both cloud pollers were fresh and the aggregate database connection used TLS. Metabase stayed private and its Pod was not replaced.
+
+Local receipts: `step11-completion.json`, `step11-access-verification.json`, `step11-release-manifest.json`, `step11-deployment.json`, `step11-rollback.json`, `step11-final-deployment.json` and `step11-analytics-{before,deployed,rollback,final}.json` under `docs/evidence`. `scripts/finalize_automation_evidence.py` refuses completion unless hosted test/artifact digests, all three sets of checks, access boundaries and data snapshots pass. Raw operator evidence is excluded from the public repository; the execution summary is safe to share.

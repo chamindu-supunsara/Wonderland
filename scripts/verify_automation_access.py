@@ -29,7 +29,8 @@ provider = iam.get_open_id_connect_provider(
     OpenIDConnectProviderArn="arn:aws:iam::708919751353:oidc-provider/token.actions.githubusercontent.com"
 )
 checks = {
-    "stack_update_complete": stack["StackStatus"] == "UPDATE_COMPLETE",
+    "stack_create_or_update_complete": stack["StackStatus"]
+    in ["CREATE_COMPLETE", "UPDATE_COMPLETE"],
     "exact_immutable_main_subject_and_audience": trust["Condition"] == expected_trust["Condition"],
     "exact_github_provider_and_web_identity_action": trust["Principal"]
     == {"Federated": "arn:aws:iam::708919751353:oidc-provider/token.actions.githubusercontent.com"}
