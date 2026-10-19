@@ -1,6 +1,6 @@
 # Step 11 — tested mock releases and controlled deployment
 
-Status: implementation prepared; real GitHub checks, OIDC release and promotion evidence are required before completion. Checkout, Admission and Analytics stay mock.
+Status: **hosted CI verified; AWS release and promotion pending**. All 211 hosted Python tests, Angular checks and all five Terraform root validations passed. Main requires the three checks and blocks force pushes/deletion, with an administrator bypass. The first OIDC publish attempt failed because its trust used the legacy name-only subject; this new repository uses immutable owner/repository IDs. The template now matches the immutable subject below, but its owner-side AWS update must be verified before retrying publishing. Checkout, Admission and Analytics stay mock.
 
 ## 1. Pipeline and access boundaries
 
@@ -8,7 +8,9 @@ Repository: https://github.com/chamindu-supunsara/Wonderland. Pull requests and 
 
 The manually dispatched **Mock release** workflow repeats the checks for its exact main commit, builds five Linux/amd64 service images, uploads them to the existing ECR repositories and saves an immutable GitHub artifact containing `manifest.json` and `frontend.zip`. The manifest records commit, run/attempt, image digests, frontend checksum and approved chart/migration fingerprints. Artifacts expire after seven days; retain the local known-good release and existing images for the agreed recovery period.
 
-GitHub OIDC grants temporary AWS credentials through `wonderland-github-release`. Trust matches exactly `repo:chamindu-supunsara@80322623/Wonderland@1425166882:ref:refs/heads/main` and audience `sts.amazonaws.com`. The role can authenticate to ECR and publish only to the five named existing repositories. It cannot read secrets, deploy to EKS, apply Terraform, create repositories or change the frontend. No static AWS access key belongs in GitHub secrets. See [GitHub's AWS OIDC guide](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws).
+Verified source/checks: commit `2ee30711e5ab9fd512c9fe8370adc81c048fcc0a`, [hosted CI run](https://github.com/chamindu-supunsara/Wonderland/actions/runs/39208674415). The five runtime images and hosted frontend have not been promoted by Step 11 yet. The approved operator `/32` was refreshed through a one-field Terraform plan and all twelve existing Deployments were healthy afterward; no capacity was added.
+
+GitHub OIDC is designed to grant temporary AWS credentials through `wonderland-github-release`. The corrected trust matches exactly `repo:chamindu-supunsara@80322623/Wonderland@1425166882:ref:refs/heads/main` and audience `sts.amazonaws.com`. Verify this exact value in AWS after the owner update. The role can authenticate to ECR and publish only to the five named existing repositories. It cannot read secrets, deploy to EKS, apply Terraform, create repositories or change the frontend. No static AWS access key belongs in GitHub secrets. See [GitHub's AWS OIDC guide](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws) and [immutable subject format](https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-GitHub-actions-oidc-tokens/).
 
 The final promotion runs on your existing Windows computer using temporary WonderlandFeasibility SSO and the existing EKS operator `/32`. This keeps the cluster API restricted and avoids another runner host or broad GitHub runner IP ranges. No persistent self-hosted GitHub runner is installed. This is automated CI/build with an explicit operator-controlled delivery stage; it is not unattended deployment on every push.
 

@@ -1,0 +1,8 @@
+# Review automation and cloud-access changes with the repository owner.
+/.github/ @chamindu-supunsara
+/scripts/ci/ @chamindu-supunsara
+/scripts/promote_release.py @chamindu-supunsara
+/scripts/github_client.py @chamindu-supunsara
+/scripts/download_release.py @chamindu-supunsara
+/deploy/automation/ @chamindu-supunsara
+/infra/ @chamindu-supunsara
